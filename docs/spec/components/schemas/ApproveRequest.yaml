@@ -1,15 +1,12 @@
 type: object
 required:
-  - network
+  - chain_id
   - address
   - token_id
-  - address_to
 properties:
   address:
     type: string
-  network:
+  chain_id:
     type: string
   token_id:
-    type: string
-  address_to:
     type: string

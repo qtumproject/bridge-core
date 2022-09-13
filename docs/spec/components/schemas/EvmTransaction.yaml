@@ -1,0 +1,30 @@
+allOf:
+  - $ref: '#/components/schemas/EvmTransactionKey'
+  - type: object
+    required:
+    - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+        - from
+        - to
+        - value
+        - data
+        - chain
+        properties:
+          from:
+            type: string
+            description: The address of the sender
+          to:
+            type: string
+            description: The address of transaction recipient
+          value:
+            type: string
+            description: The amount of wei to send
+          data:
+            type: string
+            description: transaction call data encoded as hex
+          chain:
+            type: string
+            description: The chain ID encoded as hex

@@ -8,8 +8,8 @@ type ResourceType string
 
 // List of ResourceType
 const (
-	CHAIN       ResourceType = "chain"
-	NFT         ResourceType = "nft"
-	TOKEN       ResourceType = "token"
-	TRANSACTION ResourceType = "transaction"
+	CHAIN           ResourceType = "chain"
+	EVM_TRANSACTION ResourceType = "evm_transaction"
+	NFT             ResourceType = "nft"
+	TOKEN           ResourceType = "token"
 )

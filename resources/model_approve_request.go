@@ -5,8 +5,7 @@
 package resources
 
 type ApproveRequest struct {
-	Address   string `json:"address"`
-	AddressTo string `json:"address_to"`
-	Network   string `json:"network"`
-	TokenId   string `json:"token_id"`
+	Address string `json:"address"`
+	ChainId string `json:"chain_id"`
+	TokenId string `json:"token_id"`
 }
