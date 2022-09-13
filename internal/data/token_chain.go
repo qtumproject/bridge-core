@@ -7,12 +7,20 @@ type TokenChainsQ interface {
 
 	FilterByTokenID(ids ...string) TokenChainsQ
 	FilterByChainID(ids ...string) TokenChainsQ
-	FilterByIsOriginal(isOriginal bool) TokenChainsQ
 }
 
 type TokenChain struct {
 	TokenID         string
-	ChainID         string `fig:"chain_id,required"`
-	ContractAddress string `fig:"contract_address,required"`
-	IsOriginal      bool   `fig:"is_original"`
+	ChainID         string       `fig:"chain_id,required"`
+	ContractAddress *string      `fig:"contract_address"`
+	TokenType       string       `fig:"token_type,required"`
+	BridgingType    BridgingType `fig:"bridging_type,required"`
+	AutoSend        bool         `fig:"auto_send"`
 }
+
+type BridgingType string
+
+const (
+	BridgingTypeLP      BridgingType = "liquidity_pool"
+	BridgingTypeWrapped BridgingType = "wrapped"
+)

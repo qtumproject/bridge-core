@@ -57,13 +57,6 @@ func (q *tokenChainsQ) FilterByChainID(ids ...string) data.TokenChainsQ {
 	return q
 }
 
-func (q *tokenChainsQ) FilterByIsOriginal(isOriginal bool) data.TokenChainsQ {
-	q.filters = append(q.filters, func(value data.TokenChain) bool {
-		return value.IsOriginal == isOriginal
-	})
-	return q
-}
-
 func (q *tokenChainsQ) filter(value data.TokenChain) bool {
 	for _, filter := range q.filters {
 		if !filter(value) {

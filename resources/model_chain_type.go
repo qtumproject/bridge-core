@@ -9,6 +9,5 @@ type ChainType string
 
 // List of ChainType
 const (
-	EVM    ChainType = "evm"
-	SOLANA ChainType = "solana"
+	EVM ChainType = "evm"
 )

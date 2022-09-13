@@ -62,7 +62,7 @@ func (c *chainer) readConfig() {
 			From(kv.MustGetStringMap(c.getter, "data")).
 			Please()
 		if err != nil {
-			panic(errors.Wrap(err, "failed to figure out signer"))
+			panic(errors.Wrap(err, "failed to figure out tokens and chains"))
 		}
 
 		for i, chain := range cfg.Chains {
@@ -225,18 +225,26 @@ var hooks = figure.Hooks{
 					normMap[strKey] = value
 				}
 
-				var data data.TokenChain
+				var value data.TokenChain
 
 				err := figure.
-					Out(&data).
-					With(figure.BaseHooks).
+					Out(&value).
+					With(figure.BaseHooks, figure.Hooks{
+						"data.BridgingType": func(value interface{}) (reflect.Value, error) {
+							result, err := cast.ToStringE(value)
+							if err != nil {
+								return reflect.Value{}, errors.Wrap(err, "failed to parse string")
+							}
+							return reflect.ValueOf(data.BridgingType(result)), nil
+						},
+					}).
 					From(normMap).
 					Please()
 				if err != nil {
 					return reflect.Value{}, errors.Wrap(err, "failed to figure out")
 				}
 
-				chains = append(chains, data)
+				chains = append(chains, value)
 			}
 
 			return reflect.ValueOf(chains), nil

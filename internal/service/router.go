@@ -11,7 +11,7 @@ import (
 func (s *service) router() chi.Router {
 	r := chi.NewRouter()
 
-	proxyRepo, err := proxy.NewProxyRepo(s.cfg.Chains(), s.cfg.Signer())
+	proxyRepo, err := proxy.NewProxyRepo(s.cfg.Chains())
 	if err != nil {
 		panic(err)
 	}

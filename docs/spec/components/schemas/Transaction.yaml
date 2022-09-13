@@ -10,4 +10,5 @@ allOf:
           - encoded_tx
         properties:
           encoded_tx:
-            type: string
+            type: object
+            format: json.RawMessage

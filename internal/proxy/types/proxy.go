@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"gitlab.com/tokend/bridge/core/internal/data"
 	"gitlab.com/tokend/bridge/core/resources"
-	"math/big"
 )
 
 type Proxy interface {
 	GetNftMetadata(tokenAddress string, nftID string) (*data.NFTMetadata, error)
 	CreateNonFungibleWithdrawTx(params NonFungibleWithdrawParams) (json.RawMessage, error)
 	CreateNonFungibleDepositTx(params NonFungibleDepositParams) (json.RawMessage, error)
-	CreateApprovalTx(tokenId *big.Int, tokenAddress, ownerAddress, receiverAddress string) (json.RawMessage, error)
+	//CreateApprovalTx(tokenId *big.Int, tokenAddress, ownerAddress, receiverAddress string) (json.RawMessage, error)
 
 	//GetBalance(tokenAddress string, address string) (resources.Amount, error)
 	//GetAllowance(tokenAddress string, address string) (resources.Amount, error)

@@ -6,7 +6,6 @@ import (
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/bridge/core/internal/data"
-	"gitlab.com/tokend/bridge/core/internal/service/models"
 	"gitlab.com/tokend/bridge/core/internal/service/requests"
 	"math/big"
 	"net/http"
@@ -70,12 +69,12 @@ func Approve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tx, err := ProxyRepo(r).Get(req.Network).CreateApprovalTx(tokenId, tokenChain.ContractAddress, req.Address, req.AddressTo)
-	if err != nil {
-		Log(r).WithError(err).Error("failed to build tx")
-		ape.RenderErr(w, problems.InternalError())
-		return
-	}
+	//tx, err := ProxyRepo(r).Get(req.Network).CreateApprovalTx(tokenId, tokenChain.ContractAddress, req.Address, req.AddressTo)
+	//if err != nil {
+	//	Log(r).WithError(err).Error("failed to build tx")
+	//	ape.RenderErr(w, problems.InternalError())
+	//	return
+	//}
 
-	ape.Render(w, models.NewTransactionResponse(tx))
+	//ape.Render(w, models.NewTransactionResponse(tx))
 }

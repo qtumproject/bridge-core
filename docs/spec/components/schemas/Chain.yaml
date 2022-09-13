@@ -9,7 +9,6 @@ allOf:
         type: object
         required:
           - name
-          - bridge_contract
           - chain_type
           - chain_params
         properties:
@@ -19,13 +18,11 @@ allOf:
             type: string
             description: Link to network icon
             example: https://some.storage.com/image.png
-          bridge_contract:
-            type: string
-            description: Address of bridge contract in specific chain
           chain_type:
             $ref: '#/components/schemas/ChainType'
           chain_params:
-            $ref: '#/components/schemas/ChainParams'
+            type: object
+            format: interface{}
       relationships:
         type: object
         required:

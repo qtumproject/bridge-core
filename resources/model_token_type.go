@@ -9,6 +9,6 @@ type TokenType string
 
 // List of TokenType
 const (
-	ERC20  TokenType = "erc20"
-	ERC721 TokenType = "erc721"
+	FUNGIBLE     TokenType = "fungible"
+	NON_FUNGIBLE TokenType = "non-fungible"
 )

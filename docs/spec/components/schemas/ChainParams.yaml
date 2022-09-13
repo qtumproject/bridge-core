@@ -1,3 +1,0 @@
-oneOf:
-  - $ref: '#/components/schemas/EvmChainParams'
-  - $ref: '#/components/schemas/SolanaChainParams'
