@@ -1,0 +1,13 @@
+allOf:
+  - $ref: '#/components/schemas/TransactionKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - encoded_tx
+        properties:
+          encoded_tx:
+            type: string

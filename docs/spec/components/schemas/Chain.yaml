@@ -1,0 +1,40 @@
+allOf:
+  - $ref: '#/components/schemas/ChainKey'
+  - type: object
+    required:
+      - attributes
+      - relationships
+    properties:
+      attributes:
+        type: object
+        required:
+          - name
+          - bridge_contract
+          - chain_type
+          - chain_params
+        properties:
+          name:
+            type: string
+          icon:
+            type: string
+            description: Link to network icon
+            example: https://some.storage.com/image.png
+          bridge_contract:
+            type: string
+            description: Address of bridge contract in specific chain
+          chain_type:
+            $ref: '#/components/schemas/ChainType'
+          chain_params:
+            $ref: '#/components/schemas/ChainParams'
+      relationships:
+        type: object
+        required:
+          - tokens
+        properties:
+          tokens:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TokenKey'

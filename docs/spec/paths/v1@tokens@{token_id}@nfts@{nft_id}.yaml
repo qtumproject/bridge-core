@@ -1,0 +1,48 @@
+parameters:
+  - name: token_id
+    in: path
+    description: token identifier
+    required: true
+    schema:
+      type: string
+  - name: nft_id
+    in: path
+    description: NFT identifier
+    required: true
+    schema:
+      type: string
+
+get:
+  tags:
+    - Tokens
+  summary: Get details about specific NFT
+  operationId: getNFT
+  responses:
+    200:
+      description: success
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/NFT'
+
+    400:
+      description: bad input parameter
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+    404:
+      description: not found
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+    500:
+      description: internal error
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'

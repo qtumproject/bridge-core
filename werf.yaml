@@ -1,0 +1,33 @@
+configVersion: 1
+project: 'backend'
+---
+image: builder              # Название собираемого образа.
+from: golang:1.16.2-stretch               # Базовый образ.
+docker:
+  WORKDIR: /go/src/gitlab.com/tokend/bridge/core
+git:                        # Секция с директивами для добавления исходных файлов из git-репозитория.
+  - add: /                    # Исходный путь в репозитории.
+    to: /go/src/gitlab.com/tokend/bridge/core                  # Путь назначения в образе.
+    stageDependencies:        # Настройка перевыполнения сборочных инструкций при изменениях определённых файлов в репозитории.
+      setup:                  # Для стадии Setup.
+        - "**/*"
+shell:                      # Shell сборочные инструкции.
+  setup:                    # Для стадии Setup.
+    - export CGO_ENABLED=0
+    - export GO111MODULE=off
+    - export GOOS=linux
+    - go build  -o /usr/local/bin/core  /go/src/gitlab.com/tokend/bridge/core
+
+---
+image: service              # Название собираемого образа.
+from: alpine:3.9              # Базовый образ.
+docker:
+  ENTRYPOINT: core
+shell:                      # Shell сборочные инструкции.
+  setup:                    # Для стадии Setup.
+    - apk add --no-cache ca-certificates
+import:
+  - image: builder
+    add: /usr/local/bin/core
+    to: /usr/local/bin/core
+    after: setup

@@ -1,0 +1,161 @@
+
+variables:
+  DOCKER_DRIVER: overlay2
+  SERVICE: $CI_PROJECT_NAME
+  REGISTRY: registry.gitlab.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
+  IMAGE_NAME: $REGISTRY:$CI_COMMIT_SHA
+  IMAGE_NAME_TAG: $REGISTRY:$CI_COMMIT_TAG
+  DH_IMAGE_NAME: $CI_PROJECT_ROOT_NAMESPACE/$CI_PROJECT_NAME
+  WERF_LOG_COLOR_MODE: "on"
+  WERF_IMAGES_REPO: $CI_REGISTRY_IMAGE
+
+.before_script_template: &before_script_templ
+  before_script:
+    - werf version
+    - docker version
+    - echo $CI_REGISTRY
+    - echo $CI_REGISTRY_USER
+    - echo $CI_REGISTRY_PASSWORD
+    - echo $WERF_IMAGES_REPO
+    - echo $WERF_ADD_CUSTOM_TAG_1
+
+stages:
+  - build-and-publish
+#  - code-review
+  - docs
+  #- deploy
+  #- dismiss
+  - cleanup
+
+Build and Publish:
+  stage: build-and-publish
+  tags:
+    - tokend
+  services:
+    - docker:18-dind
+  image:
+    name: "registry.gitlab.com/tokend/devops/werf-dind:8588e38f423bc5cc35c68e57e0c0dd57eb920e5d"
+    entrypoint: [""]
+  <<: *before_script_templ
+  script:
+    - type werf && source $(werf ci-env gitlab --as-file)
+    - werf build --report-path=images-report.json
+    - docker pull $(cat images-report.json | jq -r .Images.service.DockerImageName)
+    - docker tag $(cat images-report.json | jq -r .Images.service.DockerImageName) $IMAGE_NAME
+    - docker push $IMAGE_NAME
+  except: [schedules]
+
+
+Build and Publish Tag:
+  stage: build-and-publish
+  tags:
+    - tokend
+  only:
+    - tags
+  services:
+    - docker:18-dind
+  image:
+    name: "registry.gitlab.com/tokend/devops/werf-dind:8588e38f423bc5cc35c68e57e0c0dd57eb920e5d"
+    entrypoint: [""]
+  <<: *before_script_templ
+  script:
+    - type werf && source $(werf ci-env gitlab --as-file)
+    - werf build --report-path=images-report.json
+    - docker pull $(cat images-report.json | jq -r .Images.service.DockerImageName)
+    - docker tag $(cat images-report.json | jq -r .Images.service.DockerImageName) $IMAGE_NAME_TAG
+    - docker push $IMAGE_NAME_TAG
+  except: [schedules]
+
+#Code-Review:
+#  image: golang:1.18
+#  stage: code-review
+#  tags:
+#    - tokend
+#  only:
+#    - merge_requests
+#  variables:
+#    GIT_STRATEGY: clone
+#    GIT_CHECKOUT: 'true'
+#    GIT_DEPTH: '0'
+#  before_script:
+#    - |
+#      raw='runner:
+#      \n\tgolangci-lint:
+#      \n\t\tcmd: golangci-lint run
+#      \n\t\terrorformat:
+#      \n\t\t\t- "%f:%l:%c: %m"'
+#    - echo -e $raw > reviewdog.yml
+#    - curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b ./bin
+#    - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.43.0
+#  script:
+#    - if [ -f reviewdog.yml ]; then ./bin/reviewdog -reporter=gitlab-mr-discussion -tee; fi
+#  needs: []
+
+pages:
+  image: node:8
+  tags:
+    - tokend
+  stage: docs
+  only:
+    - master
+    - main
+    - dev
+  script:
+    - cd docs
+    - npm install
+    - mkdir -p ../public
+    - npm run release-build
+  artifacts:
+    paths:
+      - public
+
+
+
+# Deploy to Staging:
+#   services:
+#       - docker:18-dind
+#   image: dtzar/helm-kubectl:latest
+#   tags:
+#     - tokend-deploy
+#   stage: deploy
+#   script:
+#     - mkdir ~/.kube/
+#     - echo ${k8sconfig} | base64 -d > config
+#     - mv config ~/.kube/
+#     - helm upgrade -i "webclient" ".helm" --set global.IngressDomain=stage.${DOMAIN} --set "image.repository=${REGISTRY}" --set "image.tag=${CI_COMMIT_SHA}" --create-namespace --namespace $CI_PROJECT_NAME-stage
+#   interruptible: true
+
+
+# Deploy to Production:
+#   services:
+#       - docker:18-dind
+#   image: dtzar/helm-kubectl:latest
+#   tags:
+#     - tokend-deploy
+#   stage: deploy
+#   script:
+#     - mkdir ~/.kube/
+#     - echo ${k8sconfig} | base64 -d > config
+#     - mv config ~/.kube/
+#     - helm upgrade -i "webclient" ".helm" --set global.IngressDomain=${DOMAIN} --set "image.repository=${REGISTRY}" --set "image.tag=${CI_COMMIT_TAG}" --create-namespace --namespace $CI_PROJECT_NAME-prod
+#   when: manual
+#   interruptible: true
+
+Cleanup:
+  stage: cleanup
+  tags:
+    - tokend
+  image:
+    name: "registry.gitlab.com/tokend/devops/werf-dind:1a7ff15973f6624280eac8f3d65a89fde0800e87"
+    entrypoint: [""]
+  <<: *before_script_templ
+  script:
+    - type multiwerf && . $(multiwerf use 1.1 stable --as-file)
+    - type werf && source $(werf ci-env gitlab --as-file)
+    - docker login -u nobody -p ${WERF_IMAGES_CLEANUP_PASSWORD} ${WERF_IMAGES_REPO}
+    - werf cleanup --dev
+  only: [schedules]
+
+
+
+

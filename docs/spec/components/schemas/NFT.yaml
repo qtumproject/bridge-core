@@ -1,0 +1,17 @@
+allOf:
+  - $ref: '#/components/schemas/NFTKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - name
+        properties:
+          name:
+            type: string
+          icon:
+            type: string
+            description: Link to icon
+            example: https://some.storage.com/image.png

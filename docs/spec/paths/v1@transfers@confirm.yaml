@@ -1,0 +1,45 @@
+post:
+  tags:
+    - Transfers
+  summary: Confirm transfer
+  description: Generates transaction to send on destination network to finish cross-chain transfer
+  operationId: confirmTransfer
+  responses:
+    '200':
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Transaction'
+    '401':
+      description: blob creation not allowed
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+    '404':
+      description: account does not exist
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+    '500':
+      description: failed to save blob
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              type: object
+              $ref: '#/components/schemas/TransferConfirmationRequest'

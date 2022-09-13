@@ -1,0 +1,21 @@
+type: object
+required:
+  - token_id
+  - network_from
+  - network_to
+  - address_from
+  - address_to
+  - nft_id
+properties:
+  address_to:
+    type: string
+  address_from:
+    type: string
+  token_id:
+    type: string
+  network_from:
+    type: string
+  nft_id:
+    type: string
+  network_to:
+    type: string
