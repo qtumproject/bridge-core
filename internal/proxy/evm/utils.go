@@ -6,6 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
+	"gitlab.com/tokend/bridge/core/internal/data"
 	"gitlab.com/tokend/bridge/core/resources"
 	"math/big"
 )
@@ -23,6 +24,17 @@ func buildTransactOptsWithValue(from common.Address, value *big.Int) *bind.Trans
 		NoSend:   true,
 		GasLimit: gasLimit,
 		Value:    value,
+	}
+}
+
+func isWrappedToken(bridgingType data.BridgingType) bool {
+	switch bridgingType {
+	case data.BridgingTypeWrapped:
+		return true
+	case data.BridgingTypeLP:
+		return false
+	default:
+		panic("unsupported bridging type")
 	}
 }
 

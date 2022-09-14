@@ -11,19 +11,19 @@ import (
 	"math/big"
 )
 
-func (p *evmProxy) Approve(chain data.TokenChain, approveFrom string) (interface{}, error) {
+func (p *evmProxy) Approve(tokenChain data.TokenChain, approveFrom string) (interface{}, error) {
 	fromAddress := common.HexToAddress(approveFrom)
 
-	switch chain.TokenType {
+	switch tokenChain.TokenType {
 	case tokenTypeNative:
 		// Approve not needed for native token
 		return nil, nil
 	case tokenTypeErc20:
-		return p.approveErc20(common.HexToAddress(*chain.ContractAddress), fromAddress)
+		return p.approveErc20(common.HexToAddress(*tokenChain.ContractAddress), fromAddress)
 	case tokenTypeErc721:
-		return p.approveErc721(common.HexToAddress(*chain.ContractAddress), fromAddress)
+		return p.approveErc721(common.HexToAddress(*tokenChain.ContractAddress), fromAddress)
 	case tokenTypeErc1155:
-		return p.approveErc1155(common.HexToAddress(*chain.ContractAddress), fromAddress)
+		return p.approveErc1155(common.HexToAddress(*tokenChain.ContractAddress), fromAddress)
 	default:
 		return nil, errors.New("unknown token type")
 	}

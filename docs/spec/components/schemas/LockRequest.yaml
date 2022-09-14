@@ -1,0 +1,26 @@
+type: object
+required:
+  - token_id
+  - chain_from
+  - chain_to
+  - sender
+  - receiver
+properties:
+  token_id:
+    type: string
+  chain_from:
+    type: string
+  chain_to:
+    type: string
+  sender:
+    type: string
+  receiver:
+    type: string
+  amount:
+    type: string
+    format: amount.Amount
+    description: amount of token to transfer, should be presented only for fungible tokens transfer
+    example: "0.001"
+  nft_id:
+    type: string
+    description: id of NFT to transfer, should be presented only for NFT transfer

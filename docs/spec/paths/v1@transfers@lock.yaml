@@ -1,9 +1,9 @@
 post:
   tags:
     - Transfers
-  summary: Create transfer
-  description: Starts cross-chain transfer. Generates transaction to sign
-  operationId: createTransfer
+  summary: Lock token
+  description: Starts cross-chain transfer. Generates transaction to that will lock your token on source chain
+  operationId: lockRequest
   responses:
     '200':
       description: Success
@@ -42,4 +42,4 @@ post:
           properties:
             data:
               type: object
-              $ref: '#/components/schemas/TransferCreateRequest'
+              $ref: '#/components/schemas/LockRequest'

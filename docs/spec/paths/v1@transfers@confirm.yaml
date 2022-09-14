@@ -42,4 +42,4 @@ post:
           properties:
             data:
               type: object
-              $ref: '#/components/schemas/TransferConfirmationRequest'
+              $ref: '#/components/schemas/Transaction'

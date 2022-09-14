@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/pkg/errors"
+	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/bridge"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
 	"gitlab.com/tokend/bridge/core/internal/signature"
 	"math/big"
@@ -27,11 +29,17 @@ func NewProxy(rpc string, signer signature.Signer, bridgeContract string) (types
 		return nil, err
 	}
 
+	b, err := bridge.NewBridge(common.HexToAddress(bridgeContract), client)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to create bridge contract for address %s", bridgeContract)
+	}
+
 	return &evmProxy{
 		client:         client,
 		signer:         signer,
 		chainID:        chainID,
 		bridgeContract: common.HexToAddress(bridgeContract),
+		bridge:         b,
 	}, nil
 }
 
@@ -40,4 +48,5 @@ type evmProxy struct {
 	signer         signature.Signer
 	chainID        *big.Int
 	bridgeContract common.Address
+	bridge         *bridge.Bridge
 }

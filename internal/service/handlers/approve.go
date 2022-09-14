@@ -40,6 +40,11 @@ func Approve(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
+	if tx == nil {
+		// No approve is needed
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
 
 	ape.Render(w, tx)
 }

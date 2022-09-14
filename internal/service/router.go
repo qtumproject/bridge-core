@@ -35,6 +35,7 @@ func (s *service) router() chi.Router {
 		})
 		r.Route("/transfers", func(r chi.Router) {
 			r.Post("/approve", handlers.Approve)
+			r.Post("/lock", handlers.Lock)
 		})
 	})
 
