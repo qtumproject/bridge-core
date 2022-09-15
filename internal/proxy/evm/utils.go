@@ -9,6 +9,7 @@ import (
 	"gitlab.com/tokend/bridge/core/internal/data"
 	"gitlab.com/tokend/bridge/core/resources"
 	"math/big"
+	"strings"
 )
 
 const gasLimit = 300000
@@ -25,6 +26,10 @@ func buildTransactOptsWithValue(from common.Address, value *big.Int) *bind.Trans
 		GasLimit: gasLimit,
 		Value:    value,
 	}
+}
+
+func compareAddresses(a, b common.Address) bool {
+	return strings.ToLower(a.String()) == strings.ToLower(b.String())
 }
 
 func isWrappedToken(bridgingType data.BridgingType) bool {

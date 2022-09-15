@@ -22,7 +22,7 @@ func NewProxyRepo(chains []data.Chain, signer signature.Signer) (ProxyRepo, erro
 	for _, c := range chains {
 		switch c.Type {
 		case resources.EVM:
-			proxy, err := evm.NewProxy(c.RpcEndpoint, signer, c.BridgeContract)
+			proxy, err := evm.NewProxy(c.RpcEndpoint, signer, c.BridgeContract, c.Confirmations)
 			if err != nil {
 				return nil, errors.Wrap(err, "failed to create evm proxy")
 			}

@@ -21,6 +21,7 @@ type Chain struct {
 	Type        resources.ChainType `fig:"type,required"`
 	ChainParams json.RawMessage     `fig:"chain_params"`
 
+	Confirmations  int    `fig:"confirmations,required"`
 	BridgeContract string `fig:"bridge_contract,required"`
 	RpcEndpoint    string `fig:"rpc_endpoint,required"`
 	// Relation

@@ -18,7 +18,7 @@ const (
 	tokenTypeErc1155 = "erc1155"
 )
 
-func NewProxy(rpc string, signer signature.Signer, bridgeContract string) (types.Proxy, error) {
+func NewProxy(rpc string, signer signature.Signer, bridgeContract string, confirmations int) (types.Proxy, error) {
 	client, err := ethclient.Dial(rpc)
 	if err != nil {
 		return nil, err
@@ -40,6 +40,7 @@ func NewProxy(rpc string, signer signature.Signer, bridgeContract string) (types
 		chainID:        chainID,
 		bridgeContract: common.HexToAddress(bridgeContract),
 		bridge:         b,
+		confirmations:  confirmations,
 	}, nil
 }
 
@@ -49,4 +50,5 @@ type evmProxy struct {
 	chainID        *big.Int
 	bridgeContract common.Address
 	bridge         *bridge.Bridge
+	confirmations  int
 }

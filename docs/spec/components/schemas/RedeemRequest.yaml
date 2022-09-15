@@ -1,0 +1,21 @@
+type: object
+required:
+  - token_id
+  - chain_from
+  - tx_hash
+properties:
+  token_id:
+    type: string
+  chain_from:
+    type: string
+  tx_hash:
+    type: string
+    description: hash of transaction on chain_from that locked tokens
+  event_index:
+    type: integer
+    format: int
+    description: index of event in transaction on chain_from that locked tokens, use it only if lock transaction has a few locking events
+    default: 0
+  sender:
+    type: string
+    description: address that will send transaction to chain_to, optional by default it will be the same as receiver on source chain

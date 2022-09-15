@@ -1,9 +1,9 @@
 post:
   tags:
     - Transfers
-  summary: Confirm transfer
-  description: Generates transaction to send on destination network to finish cross-chain transfer
-  operationId: confirmTransfer
+  summary: Redeem
+  description: Checks if locking transaction is correct and finishes cross-chain transfer. Returns transaction to send on destination chain to redeem tokens. If service is configured to send transaction automatically service will send transaction to destination chain and return transaction hash.
+  operationId: redeem
   responses:
     '200':
       description: Success
@@ -41,5 +41,4 @@ post:
             - data
           properties:
             data:
-              type: object
-              $ref: '#/components/schemas/Transaction'
+              $ref: '#/components/schemas/RedeemRequest'

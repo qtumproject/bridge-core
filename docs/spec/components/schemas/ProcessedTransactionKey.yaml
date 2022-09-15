@@ -9,4 +9,4 @@ properties:
   type:
     type: string
     enum:
-      - evm_transaction
+      - processed_transaction

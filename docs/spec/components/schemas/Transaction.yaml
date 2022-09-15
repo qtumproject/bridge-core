@@ -1,2 +1,3 @@
 oneOf:
   - $ref: '#/components/schemas/EvmTransaction'
+  - $ref: '#/components/schemas/ProcessedTransactionKey'
