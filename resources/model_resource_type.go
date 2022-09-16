@@ -8,6 +8,7 @@ type ResourceType string
 
 // List of ResourceType
 const (
+	BALANCE               ResourceType = "balance"
 	CHAIN                 ResourceType = "chain"
 	EVM_TRANSACTION       ResourceType = "evm_transaction"
 	NFT                   ResourceType = "nft"

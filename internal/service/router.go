@@ -32,6 +32,9 @@ func (s *service) router() chi.Router {
 		r.Get("/chains", handlers.Chains)
 		r.Route("/tokens", func(r chi.Router) {
 			r.Get("/", handlers.Tokens)
+			r.Route("/{id}", func(r chi.Router) {
+				r.Get("/balance", handlers.GetBalance)
+			})
 		})
 		r.Route("/transfers", func(r chi.Router) {
 			r.Post("/approve", handlers.Approve)

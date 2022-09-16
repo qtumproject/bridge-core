@@ -1,0 +1,15 @@
+allOf:
+  - $ref: '#/components/schemas/ChainKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - amount
+        properties:
+          amount:
+            type: string
+            format: amount.Amount
+            description: Amount of tokens in the balance, for fungible tokens this is the total amount, for non-fungible tokens returns 1 if the token is owned by the account, 0 otherwise.
