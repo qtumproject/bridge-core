@@ -7,6 +7,7 @@ import (
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/bridge/core/internal/data"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
+	"gitlab.com/tokend/bridge/core/internal/service/models"
 	"gitlab.com/tokend/bridge/core/internal/service/requests"
 	"gitlab.com/tokend/bridge/core/resources"
 	"net/http"
@@ -106,7 +107,14 @@ func redeemFungibleToken(w http.ResponseWriter, r *http.Request, req resources.R
 		return
 	}
 
-	ape.Render(w, tx)
+	chain, err := ChainsQ(r).FilterByID(destChain.ChainID).Get()
+	if err != nil {
+		Log(r).WithError(err).Error("failed to get chain")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+
+	ape.Render(w, models.NewTxResponse(tx, *chain))
 }
 
 func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resources.RedeemRequest, sourceChain data.TokenChain) {
@@ -151,7 +159,14 @@ func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resource
 		return
 	}
 
-	ape.Render(w, tx)
+	chain, err := ChainsQ(r).FilterByID(destChain.ChainID).Get()
+	if err != nil {
+		Log(r).WithError(err).Error("failed to get chain")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+
+	ape.Render(w, models.NewTxResponse(tx, *chain))
 }
 
 func renderCheckEventError(w http.ResponseWriter, r *http.Request, err error) {

@@ -6,7 +6,8 @@ package resources
 
 type EvmTransaction struct {
 	Key
-	Attributes EvmTransactionAttributes `json:"attributes"`
+	Attributes    EvmTransactionAttributes    `json:"attributes"`
+	Relationships EvmTransactionRelationships `json:"relationships"`
 }
 type EvmTransactionResponse struct {
 	Data     EvmTransaction `json:"data"`

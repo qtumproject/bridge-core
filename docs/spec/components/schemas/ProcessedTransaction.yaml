@@ -1,0 +1,17 @@
+allOf:
+  - $ref: '#/components/schemas/ProcessedTransactionKey'
+  - type: object
+    required:
+      - relationships
+    properties:
+      relationships:
+        type: object
+        required:
+          - chains
+        properties:
+          chain:
+            type: object
+            description: The chain in which the transaction has been sent
+            properties:
+              data:
+                $ref: '#/components/schemas/ChainKey'

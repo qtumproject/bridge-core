@@ -6,6 +6,7 @@ import (
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
+	"gitlab.com/tokend/bridge/core/internal/service/models"
 	"gitlab.com/tokend/bridge/core/internal/service/requests"
 	"gitlab.com/tokend/bridge/core/resources"
 	"net/http"
@@ -110,5 +111,12 @@ func Lock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ape.Render(w, tx)
+	chain, err := ChainsQ(r).FilterByID(tokenChain.ChainID).Get()
+	if err != nil {
+		Log(r).WithError(err).Error("failed to get chain")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+
+	ape.Render(w, models.NewTxResponse(tx, *chain))
 }

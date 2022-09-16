@@ -3,6 +3,7 @@ allOf:
   - type: object
     required:
     - attributes
+    - relationships
     properties:
       attributes:
         type: object
@@ -28,3 +29,14 @@ allOf:
           chain:
             type: string
             description: The chain ID encoded as hex
+      relationships:
+        type: object
+        required:
+          - chains
+        properties:
+          chain:
+            type: object
+            description: The chain in which the transaction is to be executed
+            properties:
+              data:
+                $ref: '#/components/schemas/ChainKey'

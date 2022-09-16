@@ -36,10 +36,10 @@ func (p *evmProxy) RedeemFungible(params types.FungibleRedeemParams) (interface{
 	}
 
 	if params.TokenChain.AutoSend {
-		return p.sendTx(tx)
+		return p.sendTx(tx, params.TokenChain.ChainID)
 	}
 
-	return encodeTx(tx, common.HexToAddress(params.Sender), p.chainID)
+	return encodeTx(tx, common.HexToAddress(params.Sender), p.chainID, params.TokenChain.ChainID)
 }
 
 func (p *evmProxy) RedeemNonFungible(params types.NonFungibleRedeemParams) (interface{}, error) {
@@ -68,10 +68,10 @@ func (p *evmProxy) RedeemNonFungible(params types.NonFungibleRedeemParams) (inte
 	}
 
 	if params.TokenChain.AutoSend {
-		return p.sendTx(tx)
+		return p.sendTx(tx, params.TokenChain.ChainID)
 	}
 
-	return encodeTx(tx, common.HexToAddress(params.Sender), p.chainID)
+	return encodeTx(tx, common.HexToAddress(params.Sender), p.chainID, params.TokenChain.ChainID)
 }
 
 func (p *evmProxy) containsHash(txHash string, eventIndex int) error {
@@ -214,7 +214,7 @@ func (p *evmProxy) redeemErc1155(params types.NonFungibleRedeemParams, sender co
 	)
 }
 
-func (p *evmProxy) sendTx(tx *ethTypes.Transaction) (interface{}, error) {
+func (p *evmProxy) sendTx(tx *ethTypes.Transaction, chain string) (interface{}, error) {
 	tx, err := p.signer.SignTx(tx, p.chainID)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to sign tx")
@@ -222,5 +222,5 @@ func (p *evmProxy) sendTx(tx *ethTypes.Transaction) (interface{}, error) {
 
 	err = p.client.SendTransaction(context.TODO(), tx)
 
-	return encodeProcessedTx(tx.Hash()), errors.Wrap(err, "failed to send tx")
+	return encodeProcessedTx(tx.Hash(), chain), errors.Wrap(err, "failed to send tx")
 }

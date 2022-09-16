@@ -3,6 +3,7 @@ package evm
 import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/bridge/core/internal/data"
 	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/erc1155"
@@ -14,22 +15,29 @@ import (
 func (p *evmProxy) Approve(tokenChain data.TokenChain, approveFrom string) (interface{}, error) {
 	fromAddress := common.HexToAddress(approveFrom)
 
+	var tx *ethTypes.Transaction
+	var err error
 	switch tokenChain.TokenType {
 	case tokenTypeNative:
 		// Approve not needed for native token
 		return nil, nil
 	case tokenTypeErc20:
-		return p.approveErc20(common.HexToAddress(*tokenChain.ContractAddress), fromAddress)
+		tx, err = p.approveErc20(common.HexToAddress(*tokenChain.ContractAddress), fromAddress)
 	case tokenTypeErc721:
-		return p.approveErc721(common.HexToAddress(*tokenChain.ContractAddress), fromAddress)
+		tx, err = p.approveErc721(common.HexToAddress(*tokenChain.ContractAddress), fromAddress)
 	case tokenTypeErc1155:
-		return p.approveErc1155(common.HexToAddress(*tokenChain.ContractAddress), fromAddress)
+		tx, err = p.approveErc1155(common.HexToAddress(*tokenChain.ContractAddress), fromAddress)
 	default:
 		return nil, errors.New("unknown token type")
 	}
+	if err != nil {
+		return nil, err
+	}
+
+	return encodeTx(tx, fromAddress, p.chainID, tokenChain.ChainID)
 }
 
-func (p *evmProxy) approveErc20(tokenAddress common.Address, approveFrom common.Address) (interface{}, error) {
+func (p *evmProxy) approveErc20(tokenAddress common.Address, approveFrom common.Address) (*ethTypes.Transaction, error) {
 	token, err := erc20.NewErc20(tokenAddress, p.client)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create transactor")
@@ -51,10 +59,10 @@ func (p *evmProxy) approveErc20(tokenAddress common.Address, approveFrom common.
 		return nil, errors.Wrap(err, "failed to build token approve tx")
 	}
 
-	return encodeTx(tx, approveFrom, p.chainID)
+	return tx, nil
 }
 
-func (p *evmProxy) approveErc721(tokenAddress common.Address, approveFrom common.Address) (interface{}, error) {
+func (p *evmProxy) approveErc721(tokenAddress common.Address, approveFrom common.Address) (*ethTypes.Transaction, error) {
 	token, err := erc721.NewErc721(tokenAddress, p.client)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create transactor")
@@ -74,10 +82,10 @@ func (p *evmProxy) approveErc721(tokenAddress common.Address, approveFrom common
 		return nil, errors.Wrap(err, "failed to build token approve tx")
 	}
 
-	return encodeTx(tx, approveFrom, p.chainID)
+	return tx, err
 }
 
-func (p *evmProxy) approveErc1155(tokenAddress common.Address, approveFrom common.Address) (interface{}, error) {
+func (p *evmProxy) approveErc1155(tokenAddress common.Address, approveFrom common.Address) (*ethTypes.Transaction, error) {
 	token, err := erc1155.NewErc1155(tokenAddress, p.client)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create transactor")
@@ -97,5 +105,5 @@ func (p *evmProxy) approveErc1155(tokenAddress common.Address, approveFrom commo
 		return nil, errors.Wrap(err, "failed to build token approve tx")
 	}
 
-	return encodeTx(tx, approveFrom, p.chainID)
+	return tx, err
 }

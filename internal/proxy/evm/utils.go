@@ -63,7 +63,7 @@ func skipSig(address common.Address, transaction *types.Transaction) (*types.Tra
 	return transaction, nil
 }
 
-func encodeTx(tx *types.Transaction, from common.Address, chainID *big.Int) (interface{}, error) {
+func encodeTx(tx *types.Transaction, from common.Address, chainID *big.Int, chain string) (interface{}, error) {
 	return resources.EvmTransaction{
 		Key: resources.Key{
 			ID:   tx.Hash().String(),
@@ -76,12 +76,26 @@ func encodeTx(tx *types.Transaction, from common.Address, chainID *big.Int) (int
 			Data:  hexutil.Encode(tx.Data()),
 			Chain: fmt.Sprintf("0x%x", chainID.Int64()),
 		},
+		Relationships: resources.EvmTransactionRelationships{
+			Chain: resources.Key{
+				ID:   chain,
+				Type: resources.CHAIN,
+			}.AsRelation(),
+		},
 	}, nil
 }
 
-func encodeProcessedTx(txHash common.Hash) interface{} {
-	return resources.Key{
-		ID:   txHash.String(),
-		Type: resources.PROCESSED_TRANSACTION,
+func encodeProcessedTx(txHash common.Hash, chain string) interface{} {
+	return resources.ProcessedTransaction{
+		Key: resources.Key{
+			ID:   txHash.String(),
+			Type: resources.PROCESSED_TRANSACTION,
+		},
+		Relationships: resources.ProcessedTransactionRelationships{
+			Chain: resources.Key{
+				ID:   chain,
+				Type: resources.CHAIN,
+			}.AsRelation(),
+		},
 	}
 }
