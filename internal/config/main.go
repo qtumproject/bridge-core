@@ -6,7 +6,7 @@ import (
 	"gitlab.com/distributed_lab/kit/copus/types"
 	"gitlab.com/distributed_lab/kit/kv"
 	"gitlab.com/tokend/bridge/core/internal/data/mem"
-	"gitlab.com/tokend/bridge/core/internal/signature"
+	"gitlab.com/tokend/bridge/core/internal/proxy/evm/signature"
 )
 
 type Config interface {

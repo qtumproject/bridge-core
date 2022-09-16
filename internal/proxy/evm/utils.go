@@ -6,13 +6,29 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
+	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/bridge/core/internal/data"
+	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/erc20"
 	"gitlab.com/tokend/bridge/core/resources"
 	"math/big"
 	"strings"
 )
 
 const gasLimit = 300000
+
+func (p *evmProxy) getDecimals(tokenAddress string) (int, error) {
+	token, err := erc20.NewErc20(common.HexToAddress(tokenAddress), p.client)
+	if err != nil {
+		return 0, errors.Wrap(err, "failed to create erc20 contract")
+	}
+
+	decimals, err := token.Decimals(&bind.CallOpts{})
+	if err != nil {
+		return 0, errors.Wrap(err, "failed to get decimals")
+	}
+
+	return int(decimals), nil
+}
 
 func buildTransactOpts(from common.Address) *bind.TransactOpts {
 	return buildTransactOptsWithValue(from, nil)
@@ -61,4 +77,11 @@ func encodeTx(tx *types.Transaction, from common.Address, chainID *big.Int) (int
 			Chain: fmt.Sprintf("0x%x", chainID.Int64()),
 		},
 	}, nil
+}
+
+func encodeProcessedTx(txHash common.Hash) interface{} {
+	return resources.Key{
+		ID:   txHash.String(),
+		Type: resources.PROCESSED_TRANSACTION,
+	}
 }

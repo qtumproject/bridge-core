@@ -1,10 +1,8 @@
 package evm
 
 import (
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"gitlab.com/distributed_lab/logan/v3/errors"
-	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/erc20"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
 	"math/big"
 )
@@ -43,21 +41,16 @@ func (p *evmProxy) lockNative(params types.FungibleLockParams) (interface{}, err
 }
 
 func (p *evmProxy) lockErc20(params types.FungibleLockParams) (interface{}, error) {
-	token, err := erc20.NewErc20(common.HexToAddress(*params.TokenChain.ContractAddress), p.client)
+	decimals, err := p.getDecimals(*params.TokenChain.ContractAddress)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create erc20 contract")
-	}
-
-	decimals, err := token.Decimals(&bind.CallOpts{})
-	if err != nil {
-		return &big.Int{}, errors.Wrap(err, "failed to get decimals")
+		return nil, err
 	}
 
 	senderAddr := common.HexToAddress(params.Sender)
 	tx, err := p.bridge.DepositERC20(
 		buildTransactOpts(senderAddr),
 		common.HexToAddress(*params.TokenChain.ContractAddress),
-		params.Amount.IntWithPrecision(int(decimals)),
+		params.Amount.IntWithPrecision(decimals),
 		params.Receiver,
 		params.DestinationChain,
 		isWrappedToken(params.TokenChain.BridgingType),

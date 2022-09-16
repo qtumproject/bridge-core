@@ -60,7 +60,7 @@ func (p *evmProxy) getTxReceipt(txHash string) (*ethTypes.Receipt, error) {
 	}
 
 	if receipt.Status != ethTypes.ReceiptStatusSuccessful {
-		return nil, types.TxFailed
+		return nil, types.ErrTxFailed
 	}
 
 	height, err := p.client.BlockNumber(context.TODO())
@@ -68,7 +68,7 @@ func (p *evmProxy) getTxReceipt(txHash string) (*ethTypes.Receipt, error) {
 		return nil, errors.Wrap(err, "failed to get current blockchain height")
 	}
 	if receipt.BlockNumber.Uint64()+uint64(p.confirmations) > height {
-		return nil, types.TxNotConfirmed
+		return nil, types.ErrTxNotConfirmed
 	}
 
 	return receipt, nil
@@ -96,16 +96,21 @@ func (p *evmProxy) checkErc20LockEvent(receipt *ethTypes.Receipt, eventIndex int
 	}
 
 	if !compareAddresses(log.Token, common.HexToAddress(*tokenChain.ContractAddress)) {
-		return nil, types.WrongLockEvent
+		return nil, types.ErrWrongLockEvent
 	}
 	if log.IsWrapped && tokenChain.BridgingType != data.BridgingTypeWrapped {
-		return nil, types.WrongLockEvent
+		return nil, types.ErrWrongLockEvent
+	}
+
+	decimals, err := p.getDecimals(*tokenChain.ContractAddress)
+	if err != nil {
+		return nil, err
 	}
 
 	return &types.FungibleLockEvent{
 		Receiver:         log.Receiver,
 		DestinationChain: log.Network,
-		Amount:           amount.NewFromBigInt(log.Amount),
+		Amount:           amount.NewFromIntWithPrecision(log.Amount, decimals),
 	}, nil
 }
 
@@ -118,10 +123,10 @@ func (p *evmProxy) checkErc721LockEvent(receipt *ethTypes.Receipt, eventIndex in
 
 	tokenAddress := common.HexToAddress(*tokenChain.ContractAddress)
 	if !compareAddresses(log.Token, tokenAddress) {
-		return nil, types.WrongLockEvent
+		return nil, types.ErrWrongLockEvent
 	}
 	if log.IsWrapped && tokenChain.BridgingType != data.BridgingTypeWrapped {
-		return nil, types.WrongLockEvent
+		return nil, types.ErrWrongLockEvent
 	}
 
 	token, err := erc721.NewErc721(tokenAddress, p.client)
@@ -150,13 +155,13 @@ func (p *evmProxy) checkErc1155LockEvent(receipt *ethTypes.Receipt, eventIndex i
 
 	tokenAddress := common.HexToAddress(*tokenChain.ContractAddress)
 	if !compareAddresses(log.Token, tokenAddress) {
-		return nil, types.WrongLockEvent
+		return nil, types.ErrWrongLockEvent
 	}
 	if log.IsWrapped && tokenChain.BridgingType != data.BridgingTypeWrapped {
-		return nil, types.WrongLockEvent
+		return nil, types.ErrWrongLockEvent
 	}
 	if log.Amount.Uint64() != 1 {
-		return nil, types.WrongLockEvent
+		return nil, types.ErrWrongLockEvent
 	}
 
 	token, err := erc1155.NewErc1155(tokenAddress, p.client)
@@ -197,5 +202,5 @@ func getBridgeEvent(dest interface{}, logName string, eventIndex int, receipt *e
 		}
 	}
 
-	return types.EventNotFound
+	return types.ErrEventNotFound
 }

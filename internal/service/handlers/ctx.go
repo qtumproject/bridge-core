@@ -4,7 +4,7 @@ import (
 	"context"
 	"gitlab.com/tokend/bridge/core/internal/data"
 	"gitlab.com/tokend/bridge/core/internal/proxy"
-	"gitlab.com/tokend/bridge/core/internal/signature"
+	"gitlab.com/tokend/bridge/core/internal/proxy/evm/signature"
 	"net/http"
 
 	"gitlab.com/distributed_lab/logan/v3"

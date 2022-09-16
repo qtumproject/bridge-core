@@ -72,24 +72,41 @@ func redeemFungibleToken(w http.ResponseWriter, r *http.Request, req resources.R
 		return
 	}
 
-	ape.Render(w, event)
+	destChain, err := TokenChainsQ(r).
+		FilterByTokenID(req.TokenId).
+		FilterByChainID(event.DestinationChain).
+		Get()
+	if err != nil {
+		Log(r).WithError(err).Error("failed to get token chain")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+	if destChain == nil {
+		Log(r).WithError(err).Debug("token chain not found")
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"data/chain_to": errors.New("token that you have sent does not connected to this chain"),
+		})...)
+		return
+	}
 
-	//destChain, err := TokenChainsQ(r).
-	//	FilterByTokenID(req.TokenId).
-	//	FilterByChainID(event.DestinationChain).
-	//	Get()
-	//if err != nil {
-	//	Log(r).WithError(err).Error("failed to get token chain")
-	//	ape.RenderErr(w, problems.InternalError())
-	//	return
-	//}
-	//if destChain == nil {
-	//	Log(r).WithError(err).Debug("token chain not found")
-	//	ape.RenderErr(w, problems.BadRequest(validation.Errors{
-	//		"data/chain_to": errors.New("token that you have sent does not connected to this chain"),
-	//	})...)
-	//	return
-	//}
+	sender := event.Receiver
+	if req.Sender != nil {
+		sender = *req.Sender
+	}
+	tx, err := ProxyRepo(r).Get(destChain.ChainID).RedeemFungible(types.FungibleRedeemParams{
+		TokenChain: *destChain,
+		Amount:     event.Amount,
+		Receiver:   event.Receiver,
+		Sender:     sender,
+		TxHash:     req.TxHash,
+		EventIndex: *req.EventIndex,
+	})
+	if err != nil {
+		renderRedeemError(w, r, err)
+		return
+	}
+
+	ape.Render(w, tx)
 }
 
 func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resources.RedeemRequest, sourceChain data.TokenChain) {
@@ -99,21 +116,69 @@ func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resource
 		return
 	}
 
-	ape.Render(w, event)
+	destChain, err := TokenChainsQ(r).
+		FilterByTokenID(req.TokenId).
+		FilterByChainID(event.DestinationChain).
+		Get()
+	if err != nil {
+		Log(r).WithError(err).Error("failed to get token chain")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+	if destChain == nil {
+		Log(r).WithError(err).Debug("token chain not found")
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"data/chain_to": errors.New("token that you have sent does not connected to this chain"),
+		})...)
+		return
+	}
+
+	sender := event.Receiver
+	if req.Sender != nil {
+		sender = *req.Sender
+	}
+	tx, err := ProxyRepo(r).Get(destChain.ChainID).RedeemNonFungible(types.NonFungibleRedeemParams{
+		TokenChain: *destChain,
+		Receiver:   event.Receiver,
+		Sender:     sender,
+		TxHash:     req.TxHash,
+		EventIndex: *req.EventIndex,
+		NftId:      event.NftId,
+		NftUri:     event.NftUri,
+	})
+	if err != nil {
+		renderRedeemError(w, r, err)
+		return
+	}
+
+	ape.Render(w, tx)
 }
 
 func renderCheckEventError(w http.ResponseWriter, r *http.Request, err error) {
-	if err == types.TxNotConfirmed {
+	if err == types.ErrTxNotConfirmed {
 		Log(r).WithError(err).Debug("tx not confirmed")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
 			"data/tx_hash": errors.New("tx not confirmed"),
 		})...)
 		return
 	}
-	if err == types.EventNotFound || err == types.WrongLockEvent || err == types.TxFailed {
+	if err == types.ErrEventNotFound || err == types.ErrWrongLockEvent || err == types.ErrTxFailed {
 		Log(r).WithError(err).Debug("invalid transaction")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
 			"data/tx_hash": errors.New("invalid transaction"),
+		})...)
+		return
+	}
+	Log(r).WithError(err).Error("failed to check fungible lock event")
+	ape.RenderErr(w, problems.InternalError())
+	return
+}
+
+func renderRedeemError(w http.ResponseWriter, r *http.Request, err error) {
+	if err == types.ErrAlreadyRedeemed {
+		Log(r).WithError(err).Debug("already redeemed")
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"data/tx_hash": errors.New("already redeemed"),
 		})...)
 		return
 	}

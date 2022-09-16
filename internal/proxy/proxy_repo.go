@@ -5,8 +5,8 @@ import (
 	"github.com/pkg/errors"
 	"gitlab.com/tokend/bridge/core/internal/data"
 	"gitlab.com/tokend/bridge/core/internal/proxy/evm"
+	"gitlab.com/tokend/bridge/core/internal/proxy/evm/signature"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
-	"gitlab.com/tokend/bridge/core/internal/signature"
 	"gitlab.com/tokend/bridge/core/resources"
 )
 

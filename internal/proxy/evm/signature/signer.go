@@ -15,7 +15,8 @@ type Hasher interface {
 }
 
 type Signer interface {
-	Sign(Hasher) (*Parameters, error)
+	SignRSV(Hasher) (*Parameters, error)
+	Sign(Hasher) ([]byte, error)
 	// function needed for bind.OptsTransacion
 	SignTx(*types.Transaction, *big.Int) (*types.Transaction, error)
 	Opts(*big.Int) (*bind.TransactOpts, error)
@@ -39,13 +40,23 @@ func NewSigner(privKey *ecdsa.PrivateKey) Signer {
 	}
 }
 
-func (s *signer) Sign(hasher Hasher) (*Parameters, error) {
+func (s *signer) SignRSV(hasher Hasher) (*Parameters, error) {
 	signature, err := crypto.Sign(hasher.Hash(), s.privKey)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to sign hash")
 	}
 
 	return ParseSignatureParameters(signature)
+}
+
+func (s *signer) Sign(hasher Hasher) ([]byte, error) {
+	signature, err := crypto.Sign(signHash(hasher.Hash()), s.privKey)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to sign hash")
+	}
+	signature[64] += 27 // Transform V from 0/1 to 27/28 according to the yellow paper
+
+	return signature, nil
 }
 
 func (s *signer) SignTx(tx *types.Transaction, chainID *big.Int) (*types.Transaction, error) {

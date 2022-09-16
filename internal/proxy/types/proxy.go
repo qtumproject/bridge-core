@@ -6,11 +6,11 @@ import (
 	"gitlab.com/tokend/bridge/core/internal/data"
 )
 
-var TxNotConfirmed = errors.New("tx not confirmed yet")
-var TxFailed = errors.New("tx failed")
-var EventNotFound = errors.New("log not found")
-var WrongLockEvent = errors.New("metadata is incorrect")
-var AlreadyRedeemed = errors.New("transaction is already redeemed")
+var ErrTxNotConfirmed = errors.New("tx not confirmed yet")
+var ErrTxFailed = errors.New("tx failed")
+var ErrEventNotFound = errors.New("log not found")
+var ErrWrongLockEvent = errors.New("metadata is incorrect")
+var ErrAlreadyRedeemed = errors.New("transaction is already redeemed")
 
 type Proxy interface {
 	Approve(tokenChain data.TokenChain, approveFrom string) (interface{}, error)
@@ -18,6 +18,8 @@ type Proxy interface {
 	LockNonFungible(params NonFungibleLockParams) (interface{}, error)
 	CheckFungibleLockEvent(txHash string, eventIndex int, tokenChain data.TokenChain) (*FungibleLockEvent, error)
 	CheckNonFungibleLockEvent(txHash string, eventIndex int, tokenChain data.TokenChain) (*NonFungibleLockEvent, error)
+	RedeemFungible(params FungibleRedeemParams) (interface{}, error)
+	RedeemNonFungible(params NonFungibleRedeemParams) (interface{}, error)
 }
 
 type FungibleLockParams struct {
@@ -47,4 +49,23 @@ type NonFungibleLockEvent struct {
 	DestinationChain string
 	NftId            string
 	NftUri           string
+}
+
+type FungibleRedeemParams struct {
+	TokenChain data.TokenChain
+	Sender     string
+	Receiver   string
+	TxHash     string
+	EventIndex int
+	Amount     amount.Amount
+}
+
+type NonFungibleRedeemParams struct {
+	TokenChain data.TokenChain
+	Sender     string
+	Receiver   string
+	TxHash     string
+	EventIndex int
+	NftId      string
+	NftUri     string
 }

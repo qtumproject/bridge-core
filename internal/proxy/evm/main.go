@@ -6,8 +6,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/pkg/errors"
 	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/bridge"
+	"gitlab.com/tokend/bridge/core/internal/proxy/evm/signature"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
-	"gitlab.com/tokend/bridge/core/internal/signature"
 	"math/big"
 )
 
