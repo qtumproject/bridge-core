@@ -60,7 +60,7 @@ func (s *signer) Sign(hasher Hasher) ([]byte, error) {
 }
 
 func (s *signer) SignTx(tx *types.Transaction, chainID *big.Int) (*types.Transaction, error) {
-	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainID), s.privKey)
+	signedTx, err := types.SignTx(tx, types.NewLondonSigner(chainID), s.privKey)
 	if err != nil {
 		return nil, err
 	}

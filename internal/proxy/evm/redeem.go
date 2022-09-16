@@ -2,6 +2,7 @@ package evm
 
 import (
 	"context"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/pkg/errors"
@@ -75,13 +76,13 @@ func (p *evmProxy) RedeemNonFungible(params types.NonFungibleRedeemParams) (inte
 }
 
 func (p *evmProxy) containsHash(txHash string, eventIndex int) error {
-	//containsHash, err := p.bridge.ContainsHash(&bind.CallOpts{}, common.HexToHash(txHash), big.NewInt(int64(eventIndex)))
-	//if err != nil {
-	//	return errors.Wrap(err, "failed to check contains hash")
-	//}
-	//if containsHash {
-	//	return types.ErrAlreadyRedeemed
-	//}
+	containsHash, err := p.bridge.ContainsHash(&bind.CallOpts{}, common.HexToHash(txHash), big.NewInt(int64(eventIndex)))
+	if err != nil {
+		return errors.Wrap(err, "failed to check contains hash")
+	}
+	if containsHash {
+		return types.ErrAlreadyRedeemed
+	}
 
 	return nil
 }
