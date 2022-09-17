@@ -11,7 +11,7 @@ import (
 func (s *service) router() chi.Router {
 	r := chi.NewRouter()
 
-	proxyRepo, err := proxy.NewProxyRepo(s.cfg.Chains(), s.cfg.Signer())
+	proxyRepo, err := proxy.NewProxyRepo(s.cfg.Chains(), s.cfg.Signer(), s.cfg.IpfsClient())
 	if err != nil {
 		panic(err)
 	}
@@ -34,6 +34,7 @@ func (s *service) router() chi.Router {
 			r.Get("/", handlers.Tokens)
 			r.Route("/{id}", func(r chi.Router) {
 				r.Get("/balance", handlers.GetBalance)
+				r.Get("/nfts/{nft_id}", handlers.GetNft)
 			})
 		})
 		r.Route("/transfers", func(r chi.Router) {

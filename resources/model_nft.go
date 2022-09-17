@@ -23,9 +23,9 @@ type NftListResponse struct {
 // if entry with specified key does not exist - returns nil
 // if entry with specified key exists but type or ID mismatches - panics
 func (c *Included) MustNft(key Key) *Nft {
-	var nFT Nft
-	if c.tryFindEntry(key, &nFT) {
-		return &nFT
+	var nft Nft
+	if c.tryFindEntry(key, &nft) {
+		return &nft
 	}
 	return nil
 }

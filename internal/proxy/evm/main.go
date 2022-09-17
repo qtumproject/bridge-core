@@ -5,6 +5,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/pkg/errors"
+	"gitlab.com/tokend/bridge/core/internal/ipfs"
 	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/bridge"
 	"gitlab.com/tokend/bridge/core/internal/proxy/evm/signature"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
@@ -18,7 +19,7 @@ const (
 	tokenTypeErc1155 = "erc1155"
 )
 
-func NewProxy(rpc string, signer signature.Signer, bridgeContract string, confirmations int) (types.Proxy, error) {
+func NewProxy(rpc string, signer signature.Signer, bridgeContract string, confirmations int, ipfs ipfs.Client) (types.Proxy, error) {
 	client, err := ethclient.Dial(rpc)
 	if err != nil {
 		return nil, err
@@ -41,6 +42,7 @@ func NewProxy(rpc string, signer signature.Signer, bridgeContract string, confir
 		bridgeContract: common.HexToAddress(bridgeContract),
 		bridge:         b,
 		confirmations:  confirmations,
+		ipfsClient:     ipfs,
 	}, nil
 }
 
@@ -51,4 +53,5 @@ type evmProxy struct {
 	bridgeContract common.Address
 	bridge         *bridge.Bridge
 	confirmations  int
+	ipfsClient     ipfs.Client
 }

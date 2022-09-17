@@ -1,0 +1,33 @@
+allOf:
+  - $ref: '#/components/schemas/NftKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - metadata_url
+          - name
+          - image
+          - attributes
+        properties:
+          metadata_url:
+              type: string
+              description: original url to metadata stored in the contract
+          name:
+            type: string
+          image:
+            type: string
+            description: Link to icon
+            example: https://some.storage.com/image.png
+          description:
+            type: string
+          animation_url:
+            type: string
+          external_url:
+            type: string
+          attributes:
+            type: array
+            items:
+              $ref: '#/components/schemas/NftAttribute'

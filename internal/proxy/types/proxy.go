@@ -11,6 +11,7 @@ var ErrTxFailed = errors.New("tx failed")
 var ErrEventNotFound = errors.New("log not found")
 var ErrWrongLockEvent = errors.New("metadata is incorrect")
 var ErrAlreadyRedeemed = errors.New("transaction is already redeemed")
+var ErrNotFound = errors.New("not found")
 
 type Proxy interface {
 	Approve(tokenChain data.TokenChain, approveFrom string) (interface{}, error)
@@ -26,6 +27,7 @@ type Proxy interface {
 	// For non-fungible tokens returns 1 if the token is owned by the account, 0 otherwise
 	// nftId should be not nil for non-fungible tokens
 	Balance(tokenChain data.TokenChain, address string, nftId *string) (amount.Amount, error)
+	GetNftMetadata(tokenChain data.TokenChain, nftId string) (*NftMetadata, error)
 }
 
 type FungibleLockParams struct {

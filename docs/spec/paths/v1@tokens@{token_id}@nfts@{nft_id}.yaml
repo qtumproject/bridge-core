@@ -17,6 +17,13 @@ get:
     - Tokens
   summary: Get details about specific NFT
   operationId: getNFT
+  parameters:
+    - name: chain
+      in: query
+      description: chain on which get metadata
+      required: true
+      schema:
+        type: string
   responses:
     200:
       description: success
@@ -26,7 +33,7 @@ get:
             type: object
             properties:
               data:
-                $ref: '#/components/schemas/NFT'
+                $ref: '#/components/schemas/Nft'
 
     400:
       description: bad input parameter

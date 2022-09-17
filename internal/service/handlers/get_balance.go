@@ -7,6 +7,7 @@ import (
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/bridge/core/internal/service/models"
 	"gitlab.com/tokend/bridge/core/internal/service/requests"
+	"gitlab.com/tokend/bridge/core/resources"
 	"net/http"
 )
 
@@ -31,6 +32,20 @@ func GetBalance(w http.ResponseWriter, r *http.Request) {
 		Log(r).WithError(err).Debug("token chain not found")
 		ape.RenderErr(w, problems.BadRequest(validation.Errors{
 			"data": errors.New("token that you have sent does not connected to this network or does not exist"),
+		})...)
+		return
+	}
+
+	token, err := TokensQ(r).FilterByID(tokenChain.TokenID).Get()
+	if err != nil {
+		Log(r).WithError(err).Error("failed to get token")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+	if token.Type == resources.NON_FUNGIBLE && req.Nft == nil {
+		Log(r).WithError(err).Debug("nft id is required")
+		ape.RenderErr(w, problems.BadRequest(validation.Errors{
+			"nft": errors.New("nft id is required for balance of non-fungible token"),
 		})...)
 		return
 	}

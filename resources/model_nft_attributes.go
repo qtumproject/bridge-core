@@ -5,7 +5,13 @@
 package resources
 
 type NftAttributes struct {
+	AnimationUrl *string        `json:"animation_url,omitempty"`
+	Attributes   []NftAttribute `json:"attributes"`
+	Description  *string        `json:"description,omitempty"`
+	ExternalUrl  *string        `json:"external_url,omitempty"`
 	// Link to icon
-	Icon *string `json:"icon,omitempty"`
-	Name string  `json:"name"`
+	Image string `json:"icon"`
+	// original url to metadata stored in the contract
+	MetadataUrl string `json:"metadata_url"`
+	Name        string `json:"name"`
 }

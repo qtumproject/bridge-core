@@ -1,21 +1,36 @@
 package models
 
 import (
-	"gitlab.com/tokend/bridge/core/internal/data"
+	"fmt"
+	"gitlab.com/tokend/bridge/core/internal/proxy/types"
 	"gitlab.com/tokend/bridge/core/resources"
 )
 
-func NewNftMetadataResponse(id string, model data.NFTMetadata) resources.NftResponse {
-	return resources.NftResponse{
+func NewNftMetadataResponse(tokenId string, nftId string, model types.NftMetadata) resources.NftResponse {
+	result := resources.NftResponse{
 		Data: resources.Nft{
 			Key: resources.Key{
-				ID:   id,
+				ID:   fmt.Sprintf("%s-%s", tokenId, nftId),
 				Type: resources.NFT,
 			},
 			Attributes: resources.NftAttributes{
-				Name: model.Name,
-				Icon: &model.IconURL,
+				Name:         model.Name,
+				Image:        model.IconURL,
+				MetadataUrl:  model.MetadataUrl,
+				Description:  model.Description,
+				ExternalUrl:  model.ExternalUrl,
+				AnimationUrl: model.AnimationUrl,
+				Attributes:   make([]resources.NftAttribute, 0, len(model.Attributes)),
 			},
 		},
 	}
+
+	for _, attr := range model.Attributes {
+		result.Data.Attributes.Attributes = append(result.Data.Attributes.Attributes, resources.NftAttribute{
+			TraitType: attr.Trait,
+			Value:     attr.Value,
+		})
+	}
+
+	return result
 }
