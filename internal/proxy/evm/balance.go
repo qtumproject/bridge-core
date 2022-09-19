@@ -13,6 +13,10 @@ import (
 	"math/big"
 )
 
+func (p *evmProxy) BridgeBalance(tokenChain data.TokenChain, nftId *string) (amount.Amount, error) {
+	return p.Balance(tokenChain, p.bridgeContract.String(), nftId)
+}
+
 func (p *evmProxy) Balance(tokenChain data.TokenChain, address string, nftId *string) (amount.Amount, error) {
 	switch tokenChain.TokenType {
 	case tokenTypeNative:

@@ -5,6 +5,8 @@ import (
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
+	"gitlab.com/tokend/bridge/core/internal/amount"
+	"gitlab.com/tokend/bridge/core/internal/data"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
 	"gitlab.com/tokend/bridge/core/internal/service/models"
 	"gitlab.com/tokend/bridge/core/internal/service/requests"
@@ -66,6 +68,21 @@ func Lock(w http.ResponseWriter, r *http.Request) {
 			"data/chain_to": errors.New("token that you have sent does not connected to this chain"),
 		})...)
 		return
+	}
+	if destTokenChain.BridgingType == data.BridgingTypeLP {
+		balance, err := ProxyRepo(r).Get(destTokenChain.TokenID).BridgeBalance(*destTokenChain, req.NftId)
+		if err != nil {
+			Log(r).WithError(err).Error("failed to get bridge balance")
+			ape.RenderErr(w, problems.InternalError())
+			return
+		}
+		if amount.Cmp(balance, *req.Amount) == -1 {
+			Log(r).WithError(err).Debug("insufficient balance in destination liquidity pool")
+			ape.RenderErr(w, problems.BadRequest(validation.Errors{
+				"data/amount": errors.New("insufficient balance in destination liquidity pool"),
+			})...)
+			return
+		}
 	}
 
 	var tx interface{}
