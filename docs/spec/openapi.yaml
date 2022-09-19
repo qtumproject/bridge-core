@@ -2,7 +2,28 @@ openapi: 3.0.0
 info:
   version: 1.0.0
   title: core
-  description: ''
+  description: |
+    Service for cross-chain transfers on fungible and non-fungible tokens
+    
+    ## How to transfer tokens
+    
+    1. Get the list of supported tokens and chains with the [GET /tokens](#operation/getTokenList) method or [GET /chains](#operation/getChainList).
+    2. Select token that you want to transfer
+    3. On first transfer you need to check if bridge contract is allowed to use your token. Use [POST /transfers/approve](#operation/approveToken) method to build transaction to approve bridge contract. If you already approved bridge contract you will get 204 status code. Sign and send transaction sing your wallet.
+    4. Use [POST /transfers/lock](#operation/lockRequest) method to build transaction to lock tokens on source chain. Sign and send transaction sing your wallet.
+    5. Wait until transaction will be finalized on source chain. To check if transaction finalized make a request to [POST /transfers/redeem](#operation/redeem) you will get 400 error with proper description if transaction is not finalized.
+    6. After transaction finalized make a request to [POST /transfers/redeem](#operation/redeem) method to build transaction to redeem tokens on destination chain. Sign and send transaction sing your wallet.
+    
+    ## Redeem
+    
+    In some cases user may not finish transfer flow, for such problems we have separate redeem feature. User could provide locking transaction hash to [POST /transfers/redeem](#operation/redeem) token and backend will get all needed data from blockchain. The flow is same to redeem in normal flow.
+    
+    ## Read methods
+    
+    Service contains some read methods that could be used to get some useful info for client:
+    
+    - [GET /tokens/{token}/balance](#operation/getBalance)
+    - [GET /tokens/{token}/nfts/{nft_id}](#operation/getNFT)
 servers:
-  - url: 'https://api.demo.tokend.io'
-    description: TokenD Developer Environment
+  - url: 'https://bridge.demo.io'
+    description: Bridge
