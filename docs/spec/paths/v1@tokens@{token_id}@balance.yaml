@@ -13,17 +13,17 @@ get:
   operationId: getBalance
   parameters:
     - in: query
-      name: 'filter[address]'
+      name: 'address'
       required: true
       schema:
         type: string
     - in: query
-      name: 'filter[chain]'
+      name: 'chain'
       required: true
       schema:
         type: string
     - in: query
-      name: 'filter[nft]'
+      name: 'nft'
       required: false
       description: NFT identifier, must be provided if token is non-fungible
       schema:
