@@ -70,7 +70,7 @@ func Lock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if destTokenChain.BridgingType == data.BridgingTypeLP {
-		balance, err := ProxyRepo(r).Get(destTokenChain.TokenID).BridgeBalance(*destTokenChain, req.NftId)
+		balance, err := ProxyRepo(r).Get(destTokenChain.ChainID).BridgeBalance(*destTokenChain, req.NftId)
 		if err != nil {
 			Log(r).WithError(err).Error("failed to get bridge balance")
 			ape.RenderErr(w, problems.InternalError())
