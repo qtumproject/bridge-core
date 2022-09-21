@@ -14,6 +14,10 @@ post:
             properties:
               data:
                 $ref: '#/components/schemas/Transaction'
+              included:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chain'
     '204':
       description: Success but no approval needed
     '401':

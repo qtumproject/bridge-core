@@ -6,7 +6,7 @@ package resources
 
 type EvmTransactionAttributes struct {
 	// The chain ID encoded as hex
-	Chain string `json:"chain"`
+	ChainId string `json:"chain_id"`
 	// transaction call data encoded as hex
 	Data string `json:"data"`
 	// The address of the sender

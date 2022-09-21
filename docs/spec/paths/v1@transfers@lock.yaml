@@ -14,6 +14,10 @@ post:
             properties:
               data:
                 $ref: '#/components/schemas/Transaction'
+              included:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chain'
     '401':
       description: blob creation not allowed
       content:

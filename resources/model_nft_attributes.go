@@ -10,7 +10,7 @@ type NftAttributes struct {
 	Description  *string        `json:"description,omitempty"`
 	ExternalUrl  *string        `json:"external_url,omitempty"`
 	// Link to icon
-	Image string `json:"icon"`
+	Image string `json:"image"`
 	// original url to metadata stored in the contract
 	MetadataUrl string `json:"metadata_url"`
 	Name        string `json:"name"`
