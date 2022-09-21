@@ -33,6 +33,10 @@ func (p *evmProxy) Approve(tokenChain data.TokenChain, approveFrom string) (inte
 	if err != nil {
 		return nil, err
 	}
+	if tx == nil {
+		// Token is already approved
+		return nil, nil
+	}
 
 	return encodeTx(tx, fromAddress, p.chainID, tokenChain.ChainID)
 }
