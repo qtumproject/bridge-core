@@ -78,7 +78,11 @@ func Lock(w http.ResponseWriter, r *http.Request) {
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
-		if amount.Cmp(balance, *req.Amount) == -1 {
+		am := amount.NewFromBigInt(amount.One)
+		if req.Amount != nil {
+			am = *req.Amount
+		}
+		if amount.Cmp(balance, am) == -1 {
 			Log(r).WithError(err).Debug("insufficient balance in destination liquidity pool")
 			ape.RenderErr(w, &jsonapi.ErrorObject{
 				Title:  http.StatusText(http.StatusBadRequest),
