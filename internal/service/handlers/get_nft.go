@@ -71,5 +71,5 @@ func GetNft(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ape.Render(w, models.NewNftMetadataResponse(req.TokenId, req.NftId, *metadata))
+	ape.Render(w, models.NewNftMetadataResponse(req.NftId, *metadata))
 }

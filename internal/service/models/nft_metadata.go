@@ -6,11 +6,11 @@ import (
 	"gitlab.com/tokend/bridge/core/resources"
 )
 
-func NewNftMetadataResponse(tokenId string, nftId string, model types.NftMetadata) resources.NftResponse {
+func NewNftMetadataResponse(nftId string, model types.NftMetadata) resources.NftResponse {
 	result := resources.NftResponse{
 		Data: resources.Nft{
 			Key: resources.Key{
-				ID:   fmt.Sprintf("%s-%s", tokenId, nftId),
+				ID:   fmt.Sprintf("%s", nftId),
 				Type: resources.NFT,
 			},
 			Attributes: resources.NftAttributes{
