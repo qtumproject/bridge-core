@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"fmt"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/google/jsonapi"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
@@ -78,9 +80,12 @@ func Lock(w http.ResponseWriter, r *http.Request) {
 		}
 		if amount.Cmp(balance, *req.Amount) == -1 {
 			Log(r).WithError(err).Debug("insufficient balance in destination liquidity pool")
-			ape.RenderErr(w, problems.BadRequest(validation.Errors{
-				"data/amount": errors.New("insufficient balance in destination liquidity pool"),
-			})...)
+			ape.RenderErr(w, &jsonapi.ErrorObject{
+				Title:  http.StatusText(http.StatusBadRequest),
+				Status: fmt.Sprintf("%d", http.StatusBadRequest),
+				Detail: "Insufficient balance in destination liquidity pool",
+				Code:   "insufficient_lp_balance",
+			})
 			return
 		}
 	}

@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"fmt"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/google/jsonapi"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
@@ -172,16 +174,22 @@ func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resource
 func renderCheckEventError(w http.ResponseWriter, r *http.Request, err error) {
 	if err == types.ErrTxNotConfirmed {
 		Log(r).WithError(err).Debug("tx not confirmed")
-		ape.RenderErr(w, problems.BadRequest(validation.Errors{
-			"data/tx_hash": errors.New("tx not confirmed"),
-		})...)
+		ape.RenderErr(w, &jsonapi.ErrorObject{
+			Title:  http.StatusText(http.StatusBadRequest),
+			Status: fmt.Sprintf("%d", http.StatusBadRequest),
+			Detail: "tx not confirmed",
+			Code:   "not_confirmed",
+		})
 		return
 	}
 	if err == types.ErrEventNotFound || err == types.ErrWrongLockEvent || err == types.ErrTxFailed {
 		Log(r).WithError(err).Debug("invalid transaction")
-		ape.RenderErr(w, problems.BadRequest(validation.Errors{
-			"data/tx_hash": errors.New("invalid transaction"),
-		})...)
+		ape.RenderErr(w, &jsonapi.ErrorObject{
+			Title:  http.StatusText(http.StatusBadRequest),
+			Status: fmt.Sprintf("%d", http.StatusBadRequest),
+			Detail: "invalid transaction",
+			Code:   "invalid_transaction",
+		})
 		return
 	}
 	Log(r).WithError(err).Error("failed to check fungible lock event")
@@ -192,9 +200,12 @@ func renderCheckEventError(w http.ResponseWriter, r *http.Request, err error) {
 func renderRedeemError(w http.ResponseWriter, r *http.Request, err error) {
 	if err == types.ErrAlreadyRedeemed {
 		Log(r).WithError(err).Debug("already redeemed")
-		ape.RenderErr(w, problems.BadRequest(validation.Errors{
-			"data/tx_hash": errors.New("already redeemed"),
-		})...)
+		ape.RenderErr(w, &jsonapi.ErrorObject{
+			Title:  http.StatusText(http.StatusBadRequest),
+			Status: fmt.Sprintf("%d", http.StatusBadRequest),
+			Detail: "already redeemed",
+			Code:   "already_redeemed",
+		})
 		return
 	}
 	Log(r).WithError(err).Error("failed to check fungible lock event")
