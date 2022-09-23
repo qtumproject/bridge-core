@@ -143,6 +143,13 @@ func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resource
 		return
 	}
 
+	uri, err := getOriginalUri(r, req.TokenId, event.NftId)
+	if err != nil {
+		Log(r).WithError(err).Error("failed to get original uri")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
+
 	sender := event.Receiver
 	if req.Sender != nil {
 		sender = *req.Sender
@@ -154,7 +161,7 @@ func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resource
 		TxHash:     req.TxHash,
 		EventIndex: *req.EventIndex,
 		NftId:      event.NftId,
-		NftUri:     event.NftUri,
+		NftUri:     *uri,
 	})
 	if err != nil {
 		renderRedeemError(w, r, err)
@@ -169,6 +176,27 @@ func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resource
 	}
 
 	ape.Render(w, models.NewTxResponse(tx, *chain))
+}
+
+func getOriginalUri(r *http.Request, tokenId string, nftId string) (*string, error) {
+	chain, err := TokenChainsQ(r).
+		FilterByTokenID(tokenId).
+		// TODO: Add original chain?
+		FilterByBridgingType(data.BridgingTypeLP).
+		Get()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get original chain")
+	}
+	if chain == nil {
+		return nil, errors.New("original chain not found")
+	}
+
+	uri, err := ProxyRepo(r).Get(chain.ChainID).GetNftMetadataUri(*chain, nftId)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get nft metadata uri")
+	}
+
+	return &uri, nil
 }
 
 func renderCheckEventError(w http.ResponseWriter, r *http.Request, err error) {

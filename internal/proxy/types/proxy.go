@@ -28,6 +28,7 @@ type Proxy interface {
 	// nftId should be not nil for non-fungible tokens
 	Balance(tokenChain data.TokenChain, address string, nftId *string) (amount.Amount, error)
 	BridgeBalance(tokenChain data.TokenChain, nftId *string) (amount.Amount, error)
+	GetNftMetadataUri(tokenChain data.TokenChain, nftId string) (string, error)
 	GetNftMetadata(tokenChain data.TokenChain, nftId string) (*NftMetadata, error)
 }
 
@@ -57,7 +58,6 @@ type NonFungibleLockEvent struct {
 	Receiver         string
 	DestinationChain string
 	NftId            string
-	NftUri           string
 }
 
 type FungibleRedeemParams struct {

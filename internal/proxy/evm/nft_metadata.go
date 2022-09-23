@@ -16,9 +16,18 @@ import (
 )
 
 func (p *evmProxy) GetNftMetadata(tokenChain data.TokenChain, nftId string) (*types.NftMetadata, error) {
+	metadataUri, err := p.GetNftMetadataUri(tokenChain, nftId)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get token uri")
+	}
+
+	return p.getMetadata(metadataUri, nftId)
+}
+
+func (p *evmProxy) GetNftMetadataUri(tokenChain data.TokenChain, nftId string) (string, error) {
 	nft, ok := big.NewInt(0).SetString(nftId, 10)
 	if !ok {
-		return nil, errors.New("failed to parse nft id")
+		return "", errors.New("failed to parse nft id")
 	}
 
 	var metadataUri string
@@ -29,13 +38,13 @@ func (p *evmProxy) GetNftMetadata(tokenChain data.TokenChain, nftId string) (*ty
 	case tokenTypeErc1155:
 		metadataUri, err = p.getErc1155TokenUri(*tokenChain.ContractAddress, nft)
 	default:
-		return nil, errors.New("unsupported token type")
+		return "", errors.New("unsupported token type")
 	}
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get token uri")
+		return "nil", errors.Wrap(err, "failed to get token uri")
 	}
 
-	return p.getMetadata(metadataUri, nft)
+	return metadataUri, nil
 }
 
 func (p *evmProxy) getErc721TokenUri(tokenAddress string, nftId *big.Int) (string, error) {
@@ -66,7 +75,7 @@ func (p *evmProxy) getErc1155TokenUri(tokenAddress string, nftId *big.Int) (stri
 	return uri, nil
 }
 
-func (p *evmProxy) getMetadata(originalUrl string, nftId *big.Int) (*types.NftMetadata, error) {
+func (p *evmProxy) getMetadata(originalUrl string, nftId string) (*types.NftMetadata, error) {
 	// Wrap some custom metadata urls
 	url := p.ipfsClient.WrapUrl(originalUrl)
 	url = wrapOpenseaUrl(url, nftId)
@@ -95,17 +104,17 @@ func (p *evmProxy) wrapPointerIpfsUrl(url *string) *string {
 	return &wrapped
 }
 
-func wrapOpenseaUrl(url string, nftId *big.Int) string {
+func wrapOpenseaUrl(url string, nftId string) string {
 	if !strings.HasPrefix(url, "https://api.opensea.io") {
 		return url
 	}
 
 	// URL with 0x don't work
-	return strings.Replace(url, "0x{id}", nftId.String(), 1)
+	return strings.Replace(url, "0x{id}", nftId, 1)
 }
 
-func interpolateUrl(url string, nftId *big.Int) string {
-	return strings.Replace(url, "{id}", nftId.String(), 1)
+func interpolateUrl(url string, nftId string) string {
+	return strings.Replace(url, "{id}", nftId, 1)
 }
 
 func getMetadata(url string) (*types.NftMetadata, error) {

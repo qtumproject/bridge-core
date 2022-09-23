@@ -9,8 +9,6 @@ import (
 	"gitlab.com/tokend/bridge/core/internal/amount"
 	"gitlab.com/tokend/bridge/core/internal/data"
 	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/bridge"
-	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/erc1155"
-	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/erc721"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
 )
 
@@ -130,20 +128,10 @@ func (p *evmProxy) checkErc721LockEvent(receipt *ethTypes.Receipt, eventIndex in
 		return nil, types.ErrWrongLockEvent
 	}
 
-	token, err := erc721.NewErc721(tokenAddress, p.client)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create erc721 token instance")
-	}
-	uri, err := token.TokenURI(&bind.CallOpts{}, log.TokenId)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get token uri")
-	}
-
 	return &types.NonFungibleLockEvent{
 		Receiver:         log.Receiver,
 		DestinationChain: log.Network,
 		NftId:            log.TokenId.String(),
-		NftUri:           uri,
 	}, nil
 }
 
@@ -165,20 +153,10 @@ func (p *evmProxy) checkErc1155LockEvent(receipt *ethTypes.Receipt, eventIndex i
 		return nil, types.ErrWrongLockEvent
 	}
 
-	token, err := erc1155.NewErc1155(tokenAddress, p.client)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create erc1155 token instance")
-	}
-	uri, err := token.Uri(&bind.CallOpts{}, log.TokenId)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get token uri")
-	}
-
 	return &types.NonFungibleLockEvent{
 		Receiver:         log.Receiver,
 		DestinationChain: log.Network,
 		NftId:            log.TokenId.String(),
-		NftUri:           uri,
 	}, nil
 }
 

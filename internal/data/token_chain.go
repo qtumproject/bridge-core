@@ -7,6 +7,7 @@ type TokenChainsQ interface {
 
 	FilterByTokenID(ids ...string) TokenChainsQ
 	FilterByChainID(ids ...string) TokenChainsQ
+	FilterByBridgingType(types ...BridgingType) TokenChainsQ
 }
 
 type TokenChain struct {
