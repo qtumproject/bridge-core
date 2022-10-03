@@ -12,7 +12,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cast v1.3.1
 	gitlab.com/distributed_lab/ape v1.6.1
-	gitlab.com/distributed_lab/figure v2.1.0+incompatible
+	gitlab.com/distributed_lab/figure/v3 v3.1.0
 	gitlab.com/distributed_lab/kit v1.11.0
 	gitlab.com/distributed_lab/logan v3.8.0+incompatible
 	gitlab.com/distributed_lab/urlval v3.0.0+incompatible
@@ -50,6 +50,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.5 // indirect
 	github.com/tklauser/numcpus v0.2.2 // indirect
 	github.com/xr9kayu/logrus v0.7.2 // indirect
+	gitlab.com/distributed_lab/figure v2.1.0+incompatible // indirect
 	gitlab.com/distributed_lab/lorem v0.2.0 // indirect
 	gitlab.com/distributed_lab/running v0.0.0-20200706131153-4af0e83eb96c // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect

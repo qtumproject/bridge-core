@@ -636,6 +636,8 @@ gitlab.com/distributed_lab/ape v1.6.1 h1:UKP2yku6uHNkLwXxisZnTHhFy6tuPlafon9C/2h
 gitlab.com/distributed_lab/ape v1.6.1/go.mod h1:Qy9Y2arL0hmZIpVpctGEFhdrVsjWtyVJ5G+bZWcFT4s=
 gitlab.com/distributed_lab/figure v2.1.0+incompatible h1:8kNtvWO91BSQ4OsqL2P3qNWSBnh/Q/TdWB8vHy8xvNI=
 gitlab.com/distributed_lab/figure v2.1.0+incompatible/go.mod h1:tk+aPBohT49MGPLy5+eVbE1HpD/CaC5drBHfVpRI8eE=
+gitlab.com/distributed_lab/figure/v3 v3.1.0 h1:gSDO2EY2eLHnvXYOym+hzy3zritxjtqnngtYb1st1nc=
+gitlab.com/distributed_lab/figure/v3 v3.1.0/go.mod h1:OCFcBIn5RuQ8YRXh0lq4++PbmoYms1+JSVJalWm7WTA=
 gitlab.com/distributed_lab/kit v1.11.0 h1:gowhiPLOdK3vMoag9i0euPL2rAqLXek5bfoaqCSbsFE=
 gitlab.com/distributed_lab/kit v1.11.0/go.mod h1:AONaHSIzRE1UhzluNiGL8OH301vlCHz39tlyek8QvPY=
 gitlab.com/distributed_lab/logan v3.7.2+incompatible/go.mod h1:25oL/FPFXmyYzWeA6vahMvnFJV8P7mOx0jZhRP7nhlc=

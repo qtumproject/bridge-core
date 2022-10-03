@@ -1,17 +1,11 @@
 package mem
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/spf13/cast"
-	"gitlab.com/distributed_lab/figure"
+	"gitlab.com/distributed_lab/figure/v3"
 	"gitlab.com/distributed_lab/kit/comfig"
 	"gitlab.com/distributed_lab/kit/kv"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/bridge/core/internal/data"
-	"gitlab.com/tokend/bridge/core/resources"
-
-	"reflect"
 )
 
 func NewChainer(getter kv.Getter) Chainer {
@@ -58,7 +52,6 @@ func (c *chainer) readConfig() {
 		}{}
 		err := figure.
 			Out(&cfg).
-			With(figure.BaseHooks, topHooks).
 			From(kv.MustGetStringMap(c.getter, "data")).
 			Please()
 		if err != nil {
@@ -91,165 +84,4 @@ func (c *chainer) readConfig() {
 
 		return nil
 	})
-}
-
-var topHooks = figure.Hooks{
-	"[]data.Token": func(value interface{}) (reflect.Value, error) {
-		switch s := value.(type) {
-		case []interface{}:
-			chains := make([]data.Token, 0, len(s))
-			var err error
-			for _, rawElem := range s {
-				mapElem, ok := rawElem.(map[interface{}]interface{})
-				if !ok {
-					return reflect.Value{}, errors.Wrap(err,
-						"failed to cast mapElem to interface")
-				}
-
-				normMap := make(map[string]interface{}, len(mapElem))
-				for key, value := range mapElem {
-					strKey := fmt.Sprintf("%v", key)
-					normMap[strKey] = value
-				}
-
-				var data data.Token
-
-				err := figure.
-					Out(&data).
-					With(figure.BaseHooks, hooks).
-					From(normMap).
-					Please()
-				if err != nil {
-					return reflect.Value{}, errors.Wrap(err, "failed to figure out")
-				}
-
-				chains = append(chains, data)
-			}
-
-			return reflect.ValueOf(chains), nil
-		default:
-			return reflect.Value{}, errors.New("unexpected type while figure []data.TokenChain")
-		}
-	},
-	"[]data.Chain": func(value interface{}) (reflect.Value, error) {
-		switch s := value.(type) {
-		case []interface{}:
-			chains := make([]data.Chain, 0, len(s))
-			var err error
-			for _, rawElem := range s {
-				mapElem, ok := rawElem.(map[interface{}]interface{})
-				if !ok {
-					return reflect.Value{}, errors.Wrap(err,
-						"failed to cast mapElem to interface")
-				}
-
-				normMap := make(map[string]interface{}, len(mapElem))
-				for key, value := range mapElem {
-					strKey := fmt.Sprintf("%v", key)
-					normMap[strKey] = value
-				}
-
-				var data data.Chain
-
-				err := figure.
-					Out(&data).
-					With(figure.BaseHooks, hooks).
-					From(normMap).
-					Please()
-				if err != nil {
-					return reflect.Value{}, errors.Wrap(err, "failed to figure out")
-				}
-
-				chains = append(chains, data)
-			}
-
-			return reflect.ValueOf(chains), nil
-		default:
-			return reflect.Value{}, errors.New("unexpected type while figure []data.TokenChain")
-		}
-	},
-}
-
-var hooks = figure.Hooks{
-	"resources.TokenType": func(value interface{}) (reflect.Value, error) {
-		result, err := cast.ToStringE(value)
-		if err != nil {
-			return reflect.Value{}, errors.Wrap(err, "failed to parse string")
-		}
-		return reflect.ValueOf(resources.TokenType(result)), nil
-	},
-	"resources.ChainType": func(value interface{}) (reflect.Value, error) {
-		result, err := cast.ToStringE(value)
-		if err != nil {
-			return reflect.Value{}, errors.Wrap(err, "failed to parse string")
-		}
-		return reflect.ValueOf(resources.ChainType(result)), nil
-	},
-	"json.RawMessage": func(value interface{}) (reflect.Value, error) {
-		if value == nil {
-			return reflect.Value{}, nil
-		}
-
-		var params map[string]interface{}
-		switch s := value.(type) {
-		case map[interface{}]interface{}:
-			params = make(map[string]interface{})
-			for key, value := range s {
-				params[key.(string)] = value
-			}
-		default:
-			return reflect.Value{}, errors.New("unexpected type while figure []json.RawMessage")
-		}
-
-		result, err := json.Marshal(params)
-		if err != nil {
-			return reflect.Value{}, errors.Wrap(err, "failed to parse json.RawMessage")
-		}
-		return reflect.ValueOf(json.RawMessage(result)), nil
-	},
-	"[]data.TokenChain": func(value interface{}) (reflect.Value, error) {
-		switch s := value.(type) {
-		case []interface{}:
-			chains := make([]data.TokenChain, 0, len(s))
-			var err error
-			for _, rawElem := range s {
-				mapElem, ok := rawElem.(map[interface{}]interface{})
-				if !ok {
-					return reflect.Value{}, errors.Wrap(err,
-						"failed to cast mapElem to interface")
-				}
-
-				normMap := make(map[string]interface{}, len(mapElem))
-				for key, value := range mapElem {
-					strKey := fmt.Sprintf("%v", key)
-					normMap[strKey] = value
-				}
-
-				var value data.TokenChain
-
-				err := figure.
-					Out(&value).
-					With(figure.BaseHooks, figure.Hooks{
-						"data.BridgingType": func(value interface{}) (reflect.Value, error) {
-							result, err := cast.ToStringE(value)
-							if err != nil {
-								return reflect.Value{}, errors.Wrap(err, "failed to parse string")
-							}
-							return reflect.ValueOf(data.BridgingType(result)), nil
-						},
-					}).
-					From(normMap).
-					Please()
-				if err != nil {
-					return reflect.Value{}, errors.Wrap(err, "failed to figure out")
-				}
-
-				chains = append(chains, value)
-			}
-
-			return reflect.ValueOf(chains), nil
-		default:
-			return reflect.Value{}, errors.New("unexpected type while figure []data.TokenChain")
-		}
-	},
 }
