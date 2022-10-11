@@ -54,6 +54,9 @@ func (p *evmProxy) CheckNonFungibleLockEvent(txHash string, eventIndex int, toke
 func (p *evmProxy) getTxReceipt(txHash string) (*ethTypes.Receipt, error) {
 	receipt, err := p.client.TransactionReceipt(context.TODO(), common.HexToHash(txHash))
 	if err != nil {
+		if err.Error() == "not found" {
+			return nil, types.ErrTxNotFound
+		}
 		return nil, errors.Wrap(err, "failed to get tx by hash")
 	}
 
@@ -95,7 +98,7 @@ func (p *evmProxy) checkErc20LockEvent(receipt *ethTypes.Receipt, eventIndex int
 	}
 
 	if !compareAddresses(log.Token, common.HexToAddress(*tokenChain.ContractAddress)) {
-		return nil, types.ErrWrongLockEvent
+		return nil, types.ErrWrongToken
 	}
 	if log.IsWrapped && tokenChain.BridgingType != data.BridgingTypeWrapped {
 		return nil, types.ErrWrongLockEvent
@@ -122,7 +125,7 @@ func (p *evmProxy) checkErc721LockEvent(receipt *ethTypes.Receipt, eventIndex in
 
 	tokenAddress := common.HexToAddress(*tokenChain.ContractAddress)
 	if !compareAddresses(log.Token, tokenAddress) {
-		return nil, types.ErrWrongLockEvent
+		return nil, types.ErrWrongToken
 	}
 	if log.IsWrapped && tokenChain.BridgingType != data.BridgingTypeWrapped {
 		return nil, types.ErrWrongLockEvent
@@ -144,7 +147,7 @@ func (p *evmProxy) checkErc1155LockEvent(receipt *ethTypes.Receipt, eventIndex i
 
 	tokenAddress := common.HexToAddress(*tokenChain.ContractAddress)
 	if !compareAddresses(log.Token, tokenAddress) {
-		return nil, types.ErrWrongLockEvent
+		return nil, types.ErrWrongToken
 	}
 	if log.IsWrapped && tokenChain.BridgingType != data.BridgingTypeWrapped {
 		return nil, types.ErrWrongLockEvent

@@ -200,6 +200,26 @@ func getOriginalUri(r *http.Request, tokenId string, nftId string) (*string, err
 }
 
 func renderCheckEventError(w http.ResponseWriter, r *http.Request, err error) {
+	if err == types.ErrTxNotFound {
+		Log(r).WithError(err).Debug("tx not found")
+		ape.RenderErr(w, &jsonapi.ErrorObject{
+			Title:  http.StatusText(http.StatusBadRequest),
+			Status: fmt.Sprintf("%d", http.StatusBadRequest),
+			Detail: "tx with this hash not found, try different network or tx hash",
+			Code:   "tx_not_found",
+		})
+		return
+	}
+	if err == types.ErrWrongToken {
+		Log(r).WithError(err).Debug("wrong token")
+		ape.RenderErr(w, &jsonapi.ErrorObject{
+			Title:  http.StatusText(http.StatusBadRequest),
+			Status: fmt.Sprintf("%d", http.StatusBadRequest),
+			Detail: "transaction locks different token from the token specified in request",
+			Code:   "wrong_token",
+		})
+		return
+	}
 	if err == types.ErrTxNotConfirmed {
 		Log(r).WithError(err).Debug("tx not confirmed")
 		ape.RenderErr(w, &jsonapi.ErrorObject{
@@ -220,7 +240,7 @@ func renderCheckEventError(w http.ResponseWriter, r *http.Request, err error) {
 		})
 		return
 	}
-	Log(r).WithError(err).Error("failed to check fungible lock event")
+	Log(r).WithError(err).Error("failed to check lock event")
 	ape.RenderErr(w, problems.InternalError())
 	return
 }

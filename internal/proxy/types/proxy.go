@@ -6,10 +6,12 @@ import (
 	"gitlab.com/tokend/bridge/core/internal/data"
 )
 
+var ErrTxNotFound = errors.New("tx not found")
 var ErrTxNotConfirmed = errors.New("tx not confirmed yet")
 var ErrTxFailed = errors.New("tx failed")
 var ErrEventNotFound = errors.New("log not found")
 var ErrWrongLockEvent = errors.New("metadata is incorrect")
+var ErrWrongToken = errors.New("token is incorrect")
 var ErrAlreadyRedeemed = errors.New("transaction is already redeemed")
 var ErrNotFound = errors.New("not found")
 
