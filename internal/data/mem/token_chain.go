@@ -45,14 +45,14 @@ func (q *tokenChainsQ) Select() ([]data.TokenChain, error) {
 
 func (q *tokenChainsQ) FilterByTokenID(ids ...string) data.TokenChainsQ {
 	q.filters = append(q.filters, func(value data.TokenChain) bool {
-		return containsStr(ids, value.TokenID)
+		return contains(ids, value.TokenID)
 	})
 	return q
 }
 
 func (q *tokenChainsQ) FilterByChainID(ids ...string) data.TokenChainsQ {
 	q.filters = append(q.filters, func(value data.TokenChain) bool {
-		return containsStr(ids, value.ChainID)
+		return contains(ids, value.ChainID)
 	})
 	return q
 }
