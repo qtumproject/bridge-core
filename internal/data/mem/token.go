@@ -67,3 +67,43 @@ func (q *tokensQ) filter(token data.Token) bool {
 
 	return true
 }
+
+func (q *tokensQ) PageTokens(token data.Token) data.TokensQ {
+	result := make([]data.Token, 0, len(q.tokens))
+	//todo add pagination
+	for _, token := range q.tokens {
+		if q.filter(token) {
+			result = append(result, token)
+		}
+	}
+	return q
+}
+
+//
+//func  ApplyTo(Tokens data.Token, cols ...string) squirrel.SelectBuilder {
+//	if p.Limit == 0 {
+//		p.Limit = 15
+//	}
+//	if p.Order == "" {
+//		p.Order = OrderTypeDesc
+//	}
+//
+//	offset := p.Limit * p.PageNumber
+//
+//	sql = sql.Limit(p.Limit).Offset(offset)
+//
+//	switch p.Order {
+//	case OrderTypeAsc:
+//		for _, col := range cols {
+//			sql = sql.OrderBy(fmt.Sprintf("%s %s", col, "asc"))
+//		}
+//	case OrderTypeDesc:
+//		for _, col := range cols {
+//			sql = sql.OrderBy(fmt.Sprintf("%s %s", col, "desc"))
+//		}
+//	default:
+//		panic(fmt.Errorf("unexpected order type: %v", p.Order))
+//	}
+//
+//	return sql
+//}

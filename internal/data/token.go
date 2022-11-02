@@ -1,12 +1,14 @@
 package data
 
-import "gitlab.com/tokend/bridge/core/resources"
+import (
+	"gitlab.com/tokend/bridge/core/resources"
+)
 
 type TokensQ interface {
 	New() TokensQ
 	Select() ([]Token, error)
 	Get() (*Token, error)
-
+	PageTokens(pageParams Token) TokensQ
 	FilterByID(ids ...string) TokensQ
 	FilterByType(types ...resources.TokenType) TokensQ
 }
