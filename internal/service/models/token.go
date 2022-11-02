@@ -2,6 +2,7 @@ package models
 
 import (
 	"gitlab.com/tokend/bridge/core/internal/data"
+	"gitlab.com/tokend/bridge/core/internal/service/requests"
 	"gitlab.com/tokend/bridge/core/resources"
 )
 
@@ -46,6 +47,19 @@ func NewTokenListResponse(tokens []data.Token, chains []data.Chain) resources.To
 
 	for i, token := range tokens {
 		response.Data[i] = *newTokenModelWithRelation(token)
+	}
+
+	for _, chain := range chains {
+		response.Included.Add(newChainModel(chain))
+	}
+
+	return response
+}
+
+func NewTokenResponse(Data data.TokensQList, chains []data.Chain) requests.TokensResponse {
+	response := requests.TokensResponse{
+		Data:     Data,
+		Included: resources.Included{},
 	}
 
 	for _, chain := range chains {

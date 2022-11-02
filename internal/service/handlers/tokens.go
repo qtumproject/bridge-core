@@ -27,7 +27,12 @@ func Tokens(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
-
+	tokensPage, err := tokensQ.Page(r.URL.Query().Get("limit"), r.URL.Query().Get("page_number"), r.URL.Path, tokens)
+	if err != nil {
+		Log(r).WithError(err).Error("failed to pagination")
+		ape.RenderErr(w, problems.InternalError())
+		return
+	}
 	var chains []data.Chain
 	if request.IncludeChains {
 		chains, err = ChainsQ(r).FilterByID(chainsId(tokens)...).Select()
@@ -38,7 +43,7 @@ func Tokens(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	ape.Render(w, models.NewTokenListResponse(tokens, chains))
+	ape.Render(w, models.NewTokenResponse(tokensPage, chains))
 }
 
 func chainsId(tokens []data.Token) []string {

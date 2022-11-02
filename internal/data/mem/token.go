@@ -1,8 +1,10 @@
 package mem
 
 import (
+	"fmt"
 	"gitlab.com/tokend/bridge/core/internal/data"
 	"gitlab.com/tokend/bridge/core/resources"
+	"strconv"
 )
 
 func NewTokenQ(tokens []data.Token) data.TokensQ {
@@ -79,31 +81,31 @@ func (q *tokensQ) PageTokens(token data.Token) data.TokensQ {
 	return q
 }
 
-//
-//func  ApplyTo(Tokens data.Token, cols ...string) squirrel.SelectBuilder {
-//	if p.Limit == 0 {
-//		p.Limit = 15
-//	}
-//	if p.Order == "" {
-//		p.Order = OrderTypeDesc
-//	}
-//
-//	offset := p.Limit * p.PageNumber
-//
-//	sql = sql.Limit(p.Limit).Offset(offset)
-//
-//	switch p.Order {
-//	case OrderTypeAsc:
-//		for _, col := range cols {
-//			sql = sql.OrderBy(fmt.Sprintf("%s %s", col, "asc"))
-//		}
-//	case OrderTypeDesc:
-//		for _, col := range cols {
-//			sql = sql.OrderBy(fmt.Sprintf("%s %s", col, "desc"))
-//		}
-//	default:
-//		panic(fmt.Errorf("unexpected order type: %v", p.Order))
-//	}
-//
-//	return sql
-//}
+func (q *tokensQ) Page(limitStr, currentPageStr, path string, tokens []data.Token) (data.TokensQList, error) {
+	list := data.TokensQList{}
+	limit, err := strconv.Atoi(limitStr)
+	currentPage, err := strconv.Atoi(currentPageStr)
+	if err != nil {
+		return list, err
+	}
+	if limit == 0 {
+		limit = 15
+	}
+	if currentPage < 1 {
+		currentPage = 1
+	}
+
+	firstEntry := (currentPage - 1) * limit
+	lastEntry := firstEntry + limit
+
+	if lastEntry > len(tokens) {
+		lastEntry = len(tokens)
+	}
+	list.Items = tokens[firstEntry:lastEntry]
+	//index := strings.Index(path, "?") //
+	//rootPath := path[:index]
+
+	list.NextPageID = fmt.Sprint(path, "?page[page_number]=", currentPage+1) //todo add link
+
+	return list, nil
+}

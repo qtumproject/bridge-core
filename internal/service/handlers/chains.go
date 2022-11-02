@@ -28,7 +28,7 @@ func Chains(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
-	chainsPage, err := chainsQ.Paginate(r.URL.Query().Get("limit"), r.URL.Query().Get("page_number"), chains)
+	chainsPage, err := chainsQ.Page(r.URL.Query().Get("limit"), r.URL.Query().Get("page_number"), r.URL.Path, chains)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to pagination")
 		ape.RenderErr(w, problems.InternalError())

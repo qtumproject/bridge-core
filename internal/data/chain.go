@@ -9,16 +9,14 @@ type ChainsQ interface {
 	New() ChainsQ
 	Select() ([]Chain, error)
 	Get() (*Chain, error)
-	Paginate(limitStr, currentPageStr, path string, chains []Chain) (ChainsQList, error)
+	Page(limitStr, currentPageStr, path string, chains []Chain) (ChainsQList, error)
 	FilterByID(ids ...string) ChainsQ
 	FilterByType(types ...resources.ChainType) ChainsQ
 }
 
 type ChainsQList struct {
-	// A list of articles
-	Items []Chain `json:"items"`
-	// The id to query the next page
-	NextPageID string `json:"next_page_id,omitempty" example:"10"`
+	Items      []Chain `json:"items"`
+	NextPageID string  `json:"next_page_id,omitempty" example:"10"`
 }
 type Chain struct {
 	ID          string              `fig:"id,required"`
