@@ -1,9 +1,11 @@
 package mem
 
 import (
+	"fmt"
 	"gitlab.com/tokend/bridge/core/internal/data"
 	"gitlab.com/tokend/bridge/core/resources"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -79,7 +81,7 @@ func (q *chainsQ) filter(value data.Chain) bool {
 // ArticleList contains a list of articles
 
 // Return each page content
-func (q *chainsQ) Paginate(limitStr, currentPageStr string, chains []data.Chain) (data.ChainsQList, error) {
+func (q *chainsQ) Paginate(limitStr, currentPageStr, path string, chains []data.Chain) (data.ChainsQList, error) {
 	list := data.ChainsQList{}
 	limit, err := strconv.Atoi(limitStr)
 	currentPage, err := strconv.Atoi(currentPageStr)
@@ -100,7 +102,11 @@ func (q *chainsQ) Paginate(limitStr, currentPageStr string, chains []data.Chain)
 		lastEntry = len(chains)
 	}
 	list.Items = chains[firstEntry:lastEntry]
-	list.NextPageID = currentPage + 1 //todo add link
+	index := strings.Index(path, "?") //
+	rootPath := path[:index]
+
+	list.NextPageID = fmt.Sprint(rootPath, "?page[limit]=", currentPage+1) //todo add link
+	
 	return list, nil
 }
 
