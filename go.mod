@@ -19,7 +19,6 @@ require (
 )
 
 require (
-	github.com/Masterminds/squirrel v1.4.0 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
@@ -35,10 +34,6 @@ require (
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/jmoiron/sqlx v1.2.0 // indirect
-	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
-	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
-	github.com/lib/pq v1.8.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
