@@ -9,7 +9,7 @@ type RedeemRequest struct {
 	// index of event in transaction on chain_from that locked tokens, use it only if lock transaction has a few locking events
 	EventIndex *int `json:"event_index,omitempty"`
 	// redeem tx data with collected signatures
-	RawTxData *[]byte `json:"raw_tx_data,omitempty"`
+	RawTxData *string `json:"raw_tx_data,omitempty"`
 	// address that will send transaction to chain_to, optional by default it will be the same as receiver on source chain
 	Sender  *string `json:"sender,omitempty"`
 	TokenId string  `json:"token_id"`

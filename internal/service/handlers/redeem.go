@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/jsonapi"
 	"gitlab.com/distributed_lab/ape"
@@ -96,6 +97,15 @@ func redeemFungibleToken(w http.ResponseWriter, r *http.Request, req resources.R
 	if req.Sender != nil {
 		sender = *req.Sender
 	}
+
+	var rawTxData []byte
+	if req.RawTxData != nil {
+		rawTxData, err = hexutil.Decode(*req.RawTxData)
+		if err != nil {
+			return
+		}
+	}
+
 	tx, err := ProxyRepo(r).Get(destChain.ChainID).RedeemFungible(types.FungibleRedeemParams{
 		TokenChain: *destChain,
 		Amount:     event.Amount,
@@ -103,7 +113,7 @@ func redeemFungibleToken(w http.ResponseWriter, r *http.Request, req resources.R
 		Sender:     sender,
 		TxHash:     req.TxHash,
 		EventIndex: *req.EventIndex,
-		RawTxData:  req.RawTxData,
+		RawTxData:  &rawTxData,
 	})
 	if err != nil {
 		renderRedeemError(w, r, err)
@@ -155,6 +165,15 @@ func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resource
 	if req.Sender != nil {
 		sender = *req.Sender
 	}
+
+	var rawTxData []byte
+	if req.RawTxData != nil {
+		rawTxData, err = hexutil.Decode(*req.RawTxData)
+		if err != nil {
+			return
+		}
+	}
+
 	tx, err := ProxyRepo(r).Get(destChain.ChainID).RedeemNonFungible(types.NonFungibleRedeemParams{
 		TokenChain: *destChain,
 		Receiver:   event.Receiver,
@@ -163,7 +182,7 @@ func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resource
 		EventIndex: *req.EventIndex,
 		NftId:      event.NftId,
 		NftUri:     *uri,
-		RawTxData:  req.RawTxData,
+		RawTxData:  &rawTxData,
 	})
 	if err != nil {
 		renderRedeemError(w, r, err)

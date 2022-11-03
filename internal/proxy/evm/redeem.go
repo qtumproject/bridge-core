@@ -10,6 +10,7 @@ import (
 	"gitlab.com/tokend/bridge/core/internal/proxy/evm/signature"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
 	"math/big"
+	"reflect"
 )
 
 func (p *evmProxy) RedeemFungible(params types.FungibleRedeemParams) (interface{}, error) {
@@ -292,23 +293,14 @@ func (p *evmProxy) checkTxDataAndSign(opts *bind.TransactOpts, tx *ethTypes.Tran
 		return nil, 0, errors.New("mismatch methods name")
 	}
 
-	for key, v := range oldParams[:len(oldParams)-2] {
-		if newParams[key] != v {
-			return nil, 0, errors.New("params are not identical")
-		}
-		//if key == "signatures_" {
-		//	continue
-		//}
-		//
-		//if newParams[key] != v {
-		//
-		//}
+	if !reflect.DeepEqual(oldParams[:len(oldParams)-1], newParams[:len(newParams)-1]) {
+		return nil, 0, errors.New("params are not identical")
 	}
 
 	newParams[len(newParams)-1] = append(oldParams[len(oldParams)-1].([][]byte), newParams[len(newParams)-1].([][]byte)...)
 	if signs, ok := newParams[len(newParams)-1].([][]byte); ok {
-		contract := bind.NewBoundContract(common.Address{}, *abi, nil, nil, nil)
-		newTx, err := contract.Transact(opts, string(newMethod.ID), newParams...)
+		contract := bind.NewBoundContract(p.bridgeContract, *abi, nil, p.client, nil)
+		newTx, err := contract.Transact(opts, newMethod.Name, newParams...)
 		return newTx, int64(len(signs)), err
 	}
 
