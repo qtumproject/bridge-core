@@ -70,11 +70,13 @@ func encodeTx(tx *types.Transaction, from common.Address, chainID *big.Int, chai
 			Type: resources.EVM_TRANSACTION,
 		},
 		Attributes: resources.EvmTransactionAttributes{
-			From:    from.String(),
-			To:      tx.To().String(),
-			Value:   tx.Value().String(),
-			Data:    hexutil.Encode(tx.Data()),
-			ChainId: fmt.Sprintf("0x%x", chainID.Int64()),
+			TxBody: resources.EvmTransactionTxBody{
+				From:    from.String(),
+				To:      tx.To().String(),
+				Value:   tx.Value().String(),
+				Data:    hexutil.Encode(tx.Data()),
+				ChainId: fmt.Sprintf("0x%x", chainID.Int64()),
+			},
 		},
 		Relationships: resources.EvmTransactionRelationships{
 			Chain: resources.Key{
