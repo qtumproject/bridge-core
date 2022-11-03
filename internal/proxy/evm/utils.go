@@ -2,6 +2,7 @@ package evm
 
 import (
 	"fmt"
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -63,18 +64,19 @@ func skipSig(address common.Address, transaction *types.Transaction) (*types.Tra
 	return transaction, nil
 }
 
-func encodeTx(tx *types.Transaction, from common.Address, chainID *big.Int, chain string) (interface{}, error) {
+func encodeTx(tx *types.Transaction, from common.Address, chainID *big.Int, chain string, confirmed *bool) (interface{}, error) {
 	return resources.EvmTransaction{
 		Key: resources.Key{
 			ID:   tx.Hash().String(),
 			Type: resources.EVM_TRANSACTION,
 		},
 		Attributes: resources.EvmTransactionAttributes{
-			From:    from.String(),
-			To:      tx.To().String(),
-			Value:   tx.Value().String(),
-			Data:    hexutil.Encode(tx.Data()),
-			ChainId: fmt.Sprintf("0x%x", chainID.Int64()),
+			From:      from.String(),
+			To:        tx.To().String(),
+			Value:     tx.Value().String(),
+			Data:      hexutil.Encode(tx.Data()),
+			ChainId:   fmt.Sprintf("0x%x", chainID.Int64()),
+			Confirmed: confirmed,
 		},
 		Relationships: resources.EvmTransactionRelationships{
 			Chain: resources.Key{
@@ -98,4 +100,21 @@ func encodeProcessedTx(txHash common.Hash, chain string) interface{} {
 			}.AsRelation(),
 		},
 	}
+}
+
+func decodeTxParams(abi abi.ABI, data []byte) ([]interface{}, *abi.Method, error) {
+	m, err := abi.MethodById(data[:4])
+	if err != nil {
+		return nil, m, err
+	}
+
+	res, err := m.Inputs.Unpack(data[4:])
+	if err != nil {
+		return nil, nil, err
+	}
+	//res := map[string]interface{}{}
+	//if err := m.Inputs.UnpackIntoMap(res, data[4:]); err != nil {
+	//	return map[string]interface{}{}, m, err
+	//}
+	return res, m, nil
 }

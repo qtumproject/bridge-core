@@ -69,6 +69,7 @@ type FungibleRedeemParams struct {
 	TxHash     string
 	EventIndex int
 	Amount     amount.Amount
+	RawTxData  *[]byte
 }
 
 type NonFungibleRedeemParams struct {
@@ -79,4 +80,5 @@ type NonFungibleRedeemParams struct {
 	EventIndex int
 	NftId      string
 	NftUri     string
+	RawTxData  *[]byte
 }

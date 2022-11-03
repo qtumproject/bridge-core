@@ -29,6 +29,9 @@ allOf:
           chain_id:
             type: string
             description: The chain ID encoded as hex
+          confirmed:
+            type: bool
+            description: Is enough signatures to send tx
       relationships:
         type: object
         required:

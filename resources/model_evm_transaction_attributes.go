@@ -7,6 +7,8 @@ package resources
 type EvmTransactionAttributes struct {
 	// The chain ID encoded as hex
 	ChainId string `json:"chain_id"`
+	// Is enough signatures to send tx
+	Confirmed *bool `json:"confirmed,omitempty"`
 	// transaction call data encoded as hex
 	Data string `json:"data"`
 	// The address of the sender

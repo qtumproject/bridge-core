@@ -103,6 +103,7 @@ func redeemFungibleToken(w http.ResponseWriter, r *http.Request, req resources.R
 		Sender:     sender,
 		TxHash:     req.TxHash,
 		EventIndex: *req.EventIndex,
+		RawTxData:  req.RawTxData,
 	})
 	if err != nil {
 		renderRedeemError(w, r, err)
@@ -162,6 +163,7 @@ func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resource
 		EventIndex: *req.EventIndex,
 		NftId:      event.NftId,
 		NftUri:     *uri,
+		RawTxData:  req.RawTxData,
 	})
 	if err != nil {
 		renderRedeemError(w, r, err)
