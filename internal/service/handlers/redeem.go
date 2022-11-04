@@ -98,23 +98,25 @@ func redeemFungibleToken(w http.ResponseWriter, r *http.Request, req resources.R
 		sender = *req.Sender
 	}
 
-	var rawTxData []byte
-	if req.RawTxData != nil {
-		rawTxData, err = hexutil.Decode(*req.RawTxData)
-		if err != nil {
-			return
-		}
-	}
-
-	tx, err := ProxyRepo(r).Get(destChain.ChainID).RedeemFungible(types.FungibleRedeemParams{
+	params := types.FungibleRedeemParams{
 		TokenChain: *destChain,
 		Amount:     event.Amount,
 		Receiver:   event.Receiver,
 		Sender:     sender,
 		TxHash:     req.TxHash,
 		EventIndex: *req.EventIndex,
-		RawTxData:  &rawTxData,
-	})
+	}
+
+	if req.RawTxData != nil {
+		rawTxData, err := hexutil.Decode(*req.RawTxData)
+		if err != nil {
+			return
+		}
+
+		params.RawTxData = &rawTxData
+	}
+
+	tx, err := ProxyRepo(r).Get(destChain.ChainID).RedeemFungible(params)
 	if err != nil {
 		renderRedeemError(w, r, err)
 		return
@@ -166,15 +168,7 @@ func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resource
 		sender = *req.Sender
 	}
 
-	var rawTxData []byte
-	if req.RawTxData != nil {
-		rawTxData, err = hexutil.Decode(*req.RawTxData)
-		if err != nil {
-			return
-		}
-	}
-
-	tx, err := ProxyRepo(r).Get(destChain.ChainID).RedeemNonFungible(types.NonFungibleRedeemParams{
+	params := types.NonFungibleRedeemParams{
 		TokenChain: *destChain,
 		Receiver:   event.Receiver,
 		Sender:     sender,
@@ -182,8 +176,18 @@ func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resource
 		EventIndex: *req.EventIndex,
 		NftId:      event.NftId,
 		NftUri:     *uri,
-		RawTxData:  &rawTxData,
-	})
+	}
+
+	if req.RawTxData != nil {
+		rawTxData, err := hexutil.Decode(*req.RawTxData)
+		if err != nil {
+			return
+		}
+
+		params.RawTxData = &rawTxData
+	}
+
+	tx, err := ProxyRepo(r).Get(destChain.ChainID).RedeemNonFungible(params)
 	if err != nil {
 		renderRedeemError(w, r, err)
 		return
