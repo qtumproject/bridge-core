@@ -293,10 +293,12 @@ func (p *evmProxy) checkTxDataAndSign(opts *bind.TransactOpts, tx *ethTypes.Tran
 		return nil, 0, errors.New("mismatch methods name")
 	}
 
+	// Check if all params except signature is equal
 	if !reflect.DeepEqual(oldParams[:len(oldParams)-1], newParams[:len(newParams)-1]) {
 		return nil, 0, errors.New("params are not identical")
 	}
 
+	// Add signature to params and encode new transaction
 	newParams[len(newParams)-1] = append(oldParams[len(oldParams)-1].([][]byte), newParams[len(newParams)-1].([][]byte)...)
 	if signs, ok := newParams[len(newParams)-1].([][]byte); ok {
 		contract := bind.NewBoundContract(p.bridgeContract, *abi, nil, p.client, nil)

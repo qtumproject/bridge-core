@@ -112,9 +112,5 @@ func decodeTxParams(abi abi.ABI, data []byte) ([]interface{}, *abi.Method, error
 	if err != nil {
 		return nil, nil, err
 	}
-	//res := map[string]interface{}{}
-	//if err := m.Inputs.UnpackIntoMap(res, data[4:]); err != nil {
-	//	return map[string]interface{}{}, m, err
-	//}
 	return res, m, nil
 }
