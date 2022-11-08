@@ -30,9 +30,9 @@ func (p *evmProxy) RedeemFungible(params types.FungibleRedeemParams) (interface{
 
 	var tx *ethTypes.Transaction
 	switch params.TokenChain.TokenType {
-	case tokenTypeNative:
+	case TokenTypeNative:
 		tx, err = p.redeemNative(params, sender)
-	case tokenTypeErc20:
+	case TokenTypeErc20:
 		tx, err = p.redeemErc20(params, sender)
 	default:
 		return nil, errors.Errorf("unknown token type: %s, token: %s", params.TokenChain.TokenType,
@@ -78,9 +78,9 @@ func (p *evmProxy) RedeemNonFungible(params types.NonFungibleRedeemParams) (inte
 
 	var tx *ethTypes.Transaction
 	switch params.TokenChain.TokenType {
-	case tokenTypeErc721:
+	case TokenTypeErc721:
 		tx, err = p.redeemErc721(params, sender)
-	case tokenTypeErc1155:
+	case TokenTypeErc1155:
 		tx, err = p.redeemErc1155(params, sender)
 	default:
 		return nil, errors.Errorf("unknown token type: %s, token: %s", params.TokenChain.TokenType,
@@ -286,25 +286,34 @@ func (p *evmProxy) checkTxDataAndSign(opts *bind.TransactOpts, tx *ethTypes.Tran
 	}
 
 	if len(oldParams) != len(newParams) {
-		return nil, 0, errors.New("mismatch number of params")
+		return nil, 0, types.ErrWrongSignedTx
 	}
 
 	if newMethod.Name != oldMethod.Name {
-		return nil, 0, errors.New("mismatch methods name")
+		return nil, 0, types.ErrWrongSignedTx
 	}
 
 	// Check if all params except signature is equal
 	if !reflect.DeepEqual(oldParams[:len(oldParams)-1], newParams[:len(newParams)-1]) {
-		return nil, 0, errors.New("params are not identical")
+		return nil, 0, types.ErrWrongSignedTx
+	}
+
+	signatures := oldParams[len(oldParams)-1].([][]byte)
+	newSig := newParams[len(newParams)-1].([][]byte)[0]
+
+	for _, sig := range signatures {
+		if reflect.DeepEqual(sig, newSig) {
+			return nil, int64(len(signatures)), errors.New("double signature")
+		}
 	}
 
 	// Add signature to params and encode new transaction
-	newParams[len(newParams)-1] = append(oldParams[len(oldParams)-1].([][]byte), newParams[len(newParams)-1].([][]byte)...)
+	newParams[len(newParams)-1] = append(signatures, newSig)
 	if signs, ok := newParams[len(newParams)-1].([][]byte); ok {
 		contract := bind.NewBoundContract(p.bridgeContract, *abi, nil, p.client, nil)
 		newTx, err := contract.Transact(opts, newMethod.Name, newParams...)
 		return newTx, int64(len(signs)), err
 	}
 
-	return nil, 0, err
+	return nil, 0, errors.New("failed to cast signatures param")
 }

@@ -9,9 +9,9 @@ import (
 
 func (p *evmProxy) LockFungible(params types.FungibleLockParams) (interface{}, error) {
 	switch params.TokenChain.TokenType {
-	case tokenTypeNative:
+	case TokenTypeNative:
 		return p.lockNative(params)
-	case tokenTypeErc20:
+	case TokenTypeErc20:
 		return p.lockErc20(params)
 	default:
 		return nil, errors.New("unsupported token type")
@@ -20,9 +20,9 @@ func (p *evmProxy) LockFungible(params types.FungibleLockParams) (interface{}, e
 
 func (p *evmProxy) LockNonFungible(params types.NonFungibleLockParams) (interface{}, error) {
 	switch params.TokenChain.TokenType {
-	case tokenTypeErc721:
+	case TokenTypeErc721:
 		return p.lockErc721(params)
-	case tokenTypeErc1155:
+	case TokenTypeErc1155:
 		return p.lockErc1155(params)
 	default:
 		return nil, errors.New("unsupported token type")

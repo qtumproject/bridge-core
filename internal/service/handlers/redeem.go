@@ -281,6 +281,16 @@ func renderRedeemError(w http.ResponseWriter, r *http.Request, err error) {
 		})
 		return
 	}
+	if err == types.ErrWrongSignedTx {
+		Log(r).WithError(err).Debug("wrong signed tx")
+		ape.RenderErr(w, &jsonapi.ErrorObject{
+			Title:  http.StatusText(http.StatusBadRequest),
+			Status: fmt.Sprintf("%d", http.StatusBadRequest),
+			Detail: "Params that was provided in transaction for signing and in event is different",
+			Code:   "wrong_signed_tx",
+		})
+		return
+	}
 	Log(r).WithError(err).Error("failed to check fungible lock event")
 	ape.RenderErr(w, problems.InternalError())
 	return

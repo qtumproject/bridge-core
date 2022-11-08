@@ -18,14 +18,14 @@ func (p *evmProxy) Approve(tokenChain data.TokenChain, approveFrom string) (inte
 	var tx *ethTypes.Transaction
 	var err error
 	switch tokenChain.TokenType {
-	case tokenTypeNative:
+	case TokenTypeNative:
 		// Approve not needed for native token
 		return nil, nil
-	case tokenTypeErc20:
+	case TokenTypeErc20:
 		tx, err = p.approveErc20(common.HexToAddress(*tokenChain.ContractAddress), fromAddress)
-	case tokenTypeErc721:
+	case TokenTypeErc721:
 		tx, err = p.approveErc721(common.HexToAddress(*tokenChain.ContractAddress), fromAddress)
-	case tokenTypeErc1155:
+	case TokenTypeErc1155:
 		tx, err = p.approveErc1155(common.HexToAddress(*tokenChain.ContractAddress), fromAddress)
 	default:
 		return nil, errors.New("unknown token type")
