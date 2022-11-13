@@ -19,7 +19,7 @@ const (
 	tokenTypeErc1155 = "erc1155"
 )
 
-func NewProxy(rpc string, signer signature.Signer, bridgeContract string, confirmations int, ipfs ipfs.Client) (types.Proxy, error) {
+func NewProxy(rpc string, signer signature.Signer, bridgeContract string, ipfs ipfs.Client) (types.Proxy, error) {
 	client, err := ethclient.Dial(rpc)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,6 @@ func NewProxy(rpc string, signer signature.Signer, bridgeContract string, confir
 		chainID:        chainID,
 		bridgeContract: common.HexToAddress(bridgeContract),
 		bridge:         b,
-		confirmations:  confirmations,
 		ipfsClient:     ipfs,
 	}, nil
 }
@@ -52,6 +51,5 @@ type evmProxy struct {
 	chainID        *big.Int
 	bridgeContract common.Address
 	bridge         *bridge.Bridge
-	confirmations  int
 	ipfsClient     ipfs.Client
 }

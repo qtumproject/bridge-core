@@ -65,18 +65,10 @@ func (p *evmProxy) getTxReceipt(txHash string) (*ethTypes.Receipt, error) {
 		return nil, types.ErrTxFailed
 	}
 
-	//height, err := p.client.BlockNumber(context.TODO())
-	//if err != nil {
-	//	return nil, errors.Wrap(err, "failed to get current blockchain height")
-	//}
-	// -1 because including in block mean already one confirmation
 	err = p.getTxFinality(receipt)
 	if err != nil {
 		return nil, err
 	}
-	//if receipt.BlockNumber.Uint64()+uint64(p.confirmations-1) > height {
-	//	return nil, types.ErrTxNotConfirmed
-	//}
 
 	return receipt, nil
 }
