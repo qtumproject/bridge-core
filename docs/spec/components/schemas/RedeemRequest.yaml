@@ -19,3 +19,6 @@ properties:
   sender:
     type: string
     description: address that will send transaction to chain_to, optional by default it will be the same as receiver on source chain
+  raw_tx_data:
+    type: string
+    description: redeem tx data with collected signatures

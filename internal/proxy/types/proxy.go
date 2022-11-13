@@ -14,6 +14,7 @@ var ErrWrongLockEvent = errors.New("metadata is incorrect")
 var ErrWrongToken = errors.New("token is incorrect")
 var ErrAlreadyRedeemed = errors.New("transaction is already redeemed")
 var ErrNotFound = errors.New("not found")
+var ErrWrongSignedTx = errors.New("signed tx does not match tx log")
 
 type Proxy interface {
 	Approve(tokenChain data.TokenChain, approveFrom string) (interface{}, error)
@@ -69,6 +70,7 @@ type FungibleRedeemParams struct {
 	TxHash     string
 	EventIndex int
 	Amount     amount.Amount
+	RawTxData  *[]byte
 }
 
 type NonFungibleRedeemParams struct {
@@ -79,4 +81,5 @@ type NonFungibleRedeemParams struct {
 	EventIndex int
 	NftId      string
 	NftUri     string
+	RawTxData  *[]byte
 }

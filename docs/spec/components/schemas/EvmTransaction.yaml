@@ -12,6 +12,9 @@ allOf:
         properties:
           tx_body:
             $ref: '#/components/schemas/EvmTransactionTxBody'
+          confirmed:
+            type: bool
+            description: Is enough signatures to send tx
       relationships:
         type: object
         required:

@@ -26,9 +26,9 @@ func (p *evmProxy) CheckFungibleLockEvent(txHash string, eventIndex int, tokenCh
 	}
 
 	switch tokenChain.TokenType {
-	case tokenTypeNative:
+	case TokenTypeNative:
 		return p.checkNativeLockEvent(receipt, eventIndex)
-	case tokenTypeErc20:
+	case TokenTypeErc20:
 		return p.checkErc20LockEvent(receipt, eventIndex, tokenChain)
 	default:
 		return nil, errors.New("unsupported token type")
@@ -42,9 +42,9 @@ func (p *evmProxy) CheckNonFungibleLockEvent(txHash string, eventIndex int, toke
 	}
 
 	switch tokenChain.TokenType {
-	case tokenTypeErc721:
+	case TokenTypeErc721:
 		return p.checkErc721LockEvent(receipt, eventIndex, tokenChain)
-	case tokenTypeErc1155:
+	case TokenTypeErc1155:
 		return p.checkErc1155LockEvent(receipt, eventIndex, tokenChain)
 	default:
 		return nil, errors.New("unsupported token type")

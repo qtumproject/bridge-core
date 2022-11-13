@@ -5,5 +5,7 @@
 package resources
 
 type EvmTransactionAttributes struct {
-	TxBody EvmTransactionTxBody `json:"tx_body"`
+	// Is enough signatures to send tx
+	Confirmed *bool                `json:"confirmed,omitempty"`
+	TxBody    EvmTransactionTxBody `json:"tx_body"`
 }

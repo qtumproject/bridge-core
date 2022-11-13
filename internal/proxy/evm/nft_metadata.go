@@ -33,9 +33,9 @@ func (p *evmProxy) GetNftMetadataUri(tokenChain data.TokenChain, nftId string) (
 	var metadataUri string
 	var err error
 	switch tokenChain.TokenType {
-	case tokenTypeErc721:
+	case TokenTypeErc721:
 		metadataUri, err = p.getErc721TokenUri(*tokenChain.ContractAddress, nft)
-	case tokenTypeErc1155:
+	case TokenTypeErc1155:
 		metadataUri, err = p.getErc1155TokenUri(*tokenChain.ContractAddress, nft)
 	default:
 		return "", errors.New("unsupported token type")

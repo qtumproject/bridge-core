@@ -9,9 +9,9 @@ import (
 
 func (p *evmProxy) LockFungible(params types.FungibleLockParams) (interface{}, error) {
 	switch params.TokenChain.TokenType {
-	case tokenTypeNative:
+	case TokenTypeNative:
 		return p.lockNative(params)
-	case tokenTypeErc20:
+	case TokenTypeErc20:
 		return p.lockErc20(params)
 	default:
 		return nil, errors.New("unsupported token type")
@@ -20,9 +20,9 @@ func (p *evmProxy) LockFungible(params types.FungibleLockParams) (interface{}, e
 
 func (p *evmProxy) LockNonFungible(params types.NonFungibleLockParams) (interface{}, error) {
 	switch params.TokenChain.TokenType {
-	case tokenTypeErc721:
+	case TokenTypeErc721:
 		return p.lockErc721(params)
-	case tokenTypeErc1155:
+	case TokenTypeErc1155:
 		return p.lockErc1155(params)
 	default:
 		return nil, errors.New("unsupported token type")
@@ -37,7 +37,7 @@ func (p *evmProxy) lockNative(params types.FungibleLockParams) (interface{}, err
 		return nil, errors.Wrap(err, "failed to build deposit native transaction")
 	}
 
-	return encodeTx(tx, senderAddr, p.chainID, params.TokenChain.ChainID)
+	return encodeTx(tx, senderAddr, p.chainID, params.TokenChain.ChainID, nil)
 }
 
 func (p *evmProxy) lockErc20(params types.FungibleLockParams) (interface{}, error) {
@@ -56,7 +56,7 @@ func (p *evmProxy) lockErc20(params types.FungibleLockParams) (interface{}, erro
 		isWrappedToken(params.TokenChain.BridgingType),
 	)
 
-	return encodeTx(tx, senderAddr, p.chainID, params.TokenChain.ChainID)
+	return encodeTx(tx, senderAddr, p.chainID, params.TokenChain.ChainID, nil)
 }
 
 func (p *evmProxy) lockErc721(params types.NonFungibleLockParams) (interface{}, error) {
@@ -77,7 +77,7 @@ func (p *evmProxy) lockErc721(params types.NonFungibleLockParams) (interface{}, 
 		return nil, errors.Wrap(err, "failed to build deposit erc721 transaction")
 	}
 
-	return encodeTx(tx, senderAddr, p.chainID, params.TokenChain.ChainID)
+	return encodeTx(tx, senderAddr, p.chainID, params.TokenChain.ChainID, nil)
 }
 
 func (p *evmProxy) lockErc1155(params types.NonFungibleLockParams) (interface{}, error) {
@@ -100,5 +100,5 @@ func (p *evmProxy) lockErc1155(params types.NonFungibleLockParams) (interface{},
 		return nil, errors.Wrap(err, "failed to build deposit erc1155 transaction")
 	}
 
-	return encodeTx(tx, senderAddr, p.chainID, params.TokenChain.ChainID)
+	return encodeTx(tx, senderAddr, p.chainID, params.TokenChain.ChainID, nil)
 }

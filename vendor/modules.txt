@@ -18,6 +18,9 @@ github.com/btcsuite/btcd/btcec/v2/ecdsa
 # github.com/certifi/gocertifi v0.0.0-20200211180108-c7c1fbc02894
 ## explicit; go 1.12
 github.com/certifi/gocertifi
+# github.com/davecgh/go-spew v1.1.1
+## explicit
+github.com/davecgh/go-spew/spew
 # github.com/deckarep/golang-set v1.8.0
 ## explicit; go 1.17
 github.com/deckarep/golang-set
@@ -25,8 +28,8 @@ github.com/deckarep/golang-set
 ## explicit; go 1.16
 github.com/decred/dcrd/dcrec/secp256k1/v4
 github.com/decred/dcrd/dcrec/secp256k1/v4/ecdsa
-# github.com/ethereum/go-ethereum v1.10.18
-## explicit; go 1.16
+# github.com/ethereum/go-ethereum v1.10.25
+## explicit; go 1.17
 github.com/ethereum/go-ethereum
 github.com/ethereum/go-ethereum/accounts
 github.com/ethereum/go-ethereum/accounts/abi
@@ -115,6 +118,9 @@ github.com/pelletier/go-toml
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
+# github.com/pmezard/go-difflib v1.0.0
+## explicit
+github.com/pmezard/go-difflib/difflib
 # github.com/rjeczalik/notify v0.9.1
 ## explicit
 github.com/rjeczalik/notify
@@ -122,7 +128,7 @@ github.com/rjeczalik/notify
 ## explicit
 github.com/shirou/gopsutil/cpu
 github.com/shirou/gopsutil/internal/common
-# github.com/sirupsen/logrus v1.8.1
+# github.com/sirupsen/logrus v1.9.0
 ## explicit; go 1.13
 github.com/sirupsen/logrus
 # github.com/spf13/afero v1.6.0
@@ -141,6 +147,10 @@ github.com/spf13/pflag
 # github.com/spf13/viper v1.8.1
 ## explicit; go 1.12
 github.com/spf13/viper
+# github.com/stretchr/testify v1.8.1
+## explicit; go 1.13
+github.com/stretchr/testify/assert
+github.com/stretchr/testify/require
 # github.com/subosito/gotenv v1.2.0
 ## explicit
 github.com/subosito/gotenv
@@ -160,8 +170,8 @@ gitlab.com/distributed_lab/ape/problems
 # gitlab.com/distributed_lab/figure v2.1.0+incompatible
 ## explicit
 gitlab.com/distributed_lab/figure
-# gitlab.com/distributed_lab/figure/v3 v3.1.0
-## explicit; go 1.17
+# gitlab.com/distributed_lab/figure/v3 v3.1.1
+## explicit; go 1.18
 gitlab.com/distributed_lab/figure/v3
 # gitlab.com/distributed_lab/kit v1.11.0
 ## explicit; go 1.14
@@ -197,7 +207,7 @@ golang.org/x/crypto/sha3
 # golang.org/x/exp v0.0.0-20220426173459-3bcf042a4bf5
 ## explicit; go 1.18
 golang.org/x/exp/constraints
-# golang.org/x/sys v0.0.0-20211019181941-9d821ace8654
+# golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8
 ## explicit; go 1.17
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
@@ -216,3 +226,6 @@ gopkg.in/natefinch/npipe.v2
 # gopkg.in/yaml.v2 v2.4.0
 ## explicit; go 1.15
 gopkg.in/yaml.v2
+# gopkg.in/yaml.v3 v3.0.1
+## explicit
+gopkg.in/yaml.v3
