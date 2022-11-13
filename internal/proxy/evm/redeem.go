@@ -6,13 +6,20 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/pkg/errors"
+	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/bridge"
 	"gitlab.com/tokend/bridge/core/internal/proxy/evm/signature"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
 	"math/big"
+	"reflect"
 )
 
 func (p *evmProxy) RedeemFungible(params types.FungibleRedeemParams) (interface{}, error) {
 	if err := p.containsHash(params.TxHash, params.EventIndex); err != nil {
+		return nil, err
+	}
+
+	threshold, err := p.getThreshold()
+	if err != nil {
 		return nil, err
 	}
 
@@ -22,11 +29,10 @@ func (p *evmProxy) RedeemFungible(params types.FungibleRedeemParams) (interface{
 	}
 
 	var tx *ethTypes.Transaction
-	var err error
 	switch params.TokenChain.TokenType {
-	case tokenTypeNative:
+	case TokenTypeNative:
 		tx, err = p.redeemNative(params, sender)
-	case tokenTypeErc20:
+	case TokenTypeErc20:
 		tx, err = p.redeemErc20(params, sender)
 	default:
 		return nil, errors.Errorf("unknown token type: %s, token: %s", params.TokenChain.TokenType,
@@ -36,15 +42,32 @@ func (p *evmProxy) RedeemFungible(params types.FungibleRedeemParams) (interface{
 		return nil, err
 	}
 
-	if params.TokenChain.AutoSend {
+	signNumber := int64(1)
+
+	// if tx provided check it and sign; otherwise use created tx
+	if params.RawTxData != nil {
+		tx, signNumber, err = p.checkTxDataAndSign(buildTransactOpts(sender), tx, *params.RawTxData)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	confirmed := signNumber >= threshold
+
+	if params.TokenChain.AutoSend && confirmed {
 		return p.sendTx(tx, params.TokenChain.ChainID)
 	}
 
-	return encodeTx(tx, common.HexToAddress(params.Sender), p.chainID, params.TokenChain.ChainID)
+	return encodeTx(tx, common.HexToAddress(params.Sender), p.chainID, params.TokenChain.ChainID, &confirmed)
 }
 
 func (p *evmProxy) RedeemNonFungible(params types.NonFungibleRedeemParams) (interface{}, error) {
 	if err := p.containsHash(params.TxHash, params.EventIndex); err != nil {
+		return nil, err
+	}
+
+	threshold, err := p.getThreshold()
+	if err != nil {
 		return nil, err
 	}
 
@@ -54,11 +77,10 @@ func (p *evmProxy) RedeemNonFungible(params types.NonFungibleRedeemParams) (inte
 	}
 
 	var tx *ethTypes.Transaction
-	var err error
 	switch params.TokenChain.TokenType {
-	case tokenTypeErc721:
+	case TokenTypeErc721:
 		tx, err = p.redeemErc721(params, sender)
-	case tokenTypeErc1155:
+	case TokenTypeErc1155:
 		tx, err = p.redeemErc1155(params, sender)
 	default:
 		return nil, errors.Errorf("unknown token type: %s, token: %s", params.TokenChain.TokenType,
@@ -68,11 +90,23 @@ func (p *evmProxy) RedeemNonFungible(params types.NonFungibleRedeemParams) (inte
 		return nil, err
 	}
 
-	if params.TokenChain.AutoSend {
+	signNumber := int64(1)
+
+	// if tx provided check it and sign; otherwise use created tx
+	if params.RawTxData != nil {
+		tx, signNumber, err = p.checkTxDataAndSign(buildTransactOpts(sender), tx, *params.RawTxData)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	confirmed := signNumber >= threshold
+
+	if params.TokenChain.AutoSend && confirmed {
 		return p.sendTx(tx, params.TokenChain.ChainID)
 	}
 
-	return encodeTx(tx, common.HexToAddress(params.Sender), p.chainID, params.TokenChain.ChainID)
+	return encodeTx(tx, common.HexToAddress(params.Sender), p.chainID, params.TokenChain.ChainID, &confirmed)
 }
 
 func (p *evmProxy) containsHash(txHash string, eventIndex int) error {
@@ -224,4 +258,62 @@ func (p *evmProxy) sendTx(tx *ethTypes.Transaction, chain string) (interface{}, 
 	err = p.client.SendTransaction(context.TODO(), tx)
 
 	return encodeProcessedTx(tx.Hash(), chain), errors.Wrap(err, "failed to send tx")
+}
+
+func (p *evmProxy) getThreshold() (int64, error) {
+	threshold, err := p.bridge.SignaturesThreshold(&bind.CallOpts{})
+	if err != nil {
+		return 0, err
+	}
+
+	return threshold.Int64(), nil
+}
+
+func (p *evmProxy) checkTxDataAndSign(opts *bind.TransactOpts, tx *ethTypes.Transaction, rawData []byte) (*ethTypes.Transaction, int64, error) {
+	abi, err := bridge.BridgeMetaData.GetAbi()
+	if err != nil {
+		return nil, 0, errors.Wrap(err, "failed to parse bridge ABI")
+	}
+
+	newParams, newMethod, err := decodeTxParams(*abi, tx.Data())
+	if err != nil {
+		return nil, 0, errors.Wrap(err, "failed to decode tx params")
+	}
+
+	oldParams, oldMethod, err := decodeTxParams(*abi, rawData)
+	if err != nil {
+		return nil, 0, errors.Wrap(err, "failed to decode tx params")
+	}
+
+	if len(oldParams) != len(newParams) {
+		return nil, 0, types.ErrWrongSignedTx
+	}
+
+	if newMethod.Name != oldMethod.Name {
+		return nil, 0, types.ErrWrongSignedTx
+	}
+
+	// Check if all params except signature is equal
+	if !reflect.DeepEqual(oldParams[:len(oldParams)-1], newParams[:len(newParams)-1]) {
+		return nil, 0, types.ErrWrongSignedTx
+	}
+
+	signatures := oldParams[len(oldParams)-1].([][]byte)
+	newSig := newParams[len(newParams)-1].([][]byte)[0]
+
+	for _, sig := range signatures {
+		if reflect.DeepEqual(sig, newSig) {
+			return nil, int64(len(signatures)), errors.New("double signature")
+		}
+	}
+
+	// Add signature to params and encode new transaction
+	newParams[len(newParams)-1] = append(signatures, newSig)
+	if signs, ok := newParams[len(newParams)-1].([][]byte); ok {
+		contract := bind.NewBoundContract(p.bridgeContract, *abi, nil, p.client, nil)
+		newTx, err := contract.Transact(opts, newMethod.Name, newParams...)
+		return newTx, int64(len(signs)), err
+	}
+
+	return nil, 0, errors.New("failed to cast signatures param")
 }

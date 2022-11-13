@@ -8,27 +8,13 @@ allOf:
       attributes:
         type: object
         required:
-        - from
-        - to
-        - value
-        - data
-        - chain_id
+          - tx_body
         properties:
-          from:
-            type: string
-            description: The address of the sender
-          to:
-            type: string
-            description: The address of transaction recipient
-          value:
-            type: string
-            description: The amount of wei to send
-          data:
-            type: string
-            description: transaction call data encoded as hex
-          chain_id:
-            type: string
-            description: The chain ID encoded as hex
+          tx_body:
+            $ref: '#/components/schemas/EvmTransactionTxBody'
+          confirmed:
+            type: bool
+            description: Is enough signatures to send tx
       relationships:
         type: object
         required:

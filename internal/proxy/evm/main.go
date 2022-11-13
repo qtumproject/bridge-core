@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	tokenTypeNative  = "native"
-	tokenTypeErc20   = "erc20"
-	tokenTypeErc721  = "erc721"
-	tokenTypeErc1155 = "erc1155"
+	TokenTypeNative  = "native"
+	TokenTypeErc20   = "erc20"
+	TokenTypeErc721  = "erc721"
+	TokenTypeErc1155 = "erc1155"
 )
 
 func NewProxy(rpc string, signer signature.Signer, bridgeContract string, ipfs ipfs.Client) (types.Proxy, error) {

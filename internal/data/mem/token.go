@@ -46,14 +46,14 @@ func (q *tokensQ) Select() ([]data.Token, error) {
 
 func (q *tokensQ) FilterByID(ids ...string) data.TokensQ {
 	q.filters = append(q.filters, func(token data.Token) bool {
-		return containsStr(ids, token.ID)
+		return contains(ids, token.ID)
 	})
 	return q
 }
 
 func (q *tokensQ) FilterByType(types ...resources.TokenType) data.TokensQ {
 	q.filters = append(q.filters, func(token data.Token) bool {
-		return containsTokenType(types, token.Type)
+		return contains(types, token.Type)
 	})
 	return q
 }

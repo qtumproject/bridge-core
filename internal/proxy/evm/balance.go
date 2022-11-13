@@ -19,13 +19,13 @@ func (p *evmProxy) BridgeBalance(tokenChain data.TokenChain, nftId *string) (amo
 
 func (p *evmProxy) Balance(tokenChain data.TokenChain, address string, nftId *string) (amount.Amount, error) {
 	switch tokenChain.TokenType {
-	case tokenTypeNative:
+	case TokenTypeNative:
 		return p.nativeBalance(address)
-	case tokenTypeErc20:
+	case TokenTypeErc20:
 		return p.erc20Balance(*tokenChain.ContractAddress, address)
-	case tokenTypeErc721:
+	case TokenTypeErc721:
 		return p.erc721Balance(*tokenChain.ContractAddress, address, *nftId)
-	case tokenTypeErc1155:
+	case TokenTypeErc1155:
 		return p.erc1155Balance(*tokenChain.ContractAddress, address, *nftId)
 	default:
 		return amount.Amount{}, errors.Errorf("unknown token type: %s, token: %s", tokenChain.TokenType, tokenChain.TokenID)

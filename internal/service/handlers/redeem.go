@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/jsonapi"
 	"gitlab.com/distributed_lab/ape"
@@ -96,14 +97,26 @@ func redeemFungibleToken(w http.ResponseWriter, r *http.Request, req resources.R
 	if req.Sender != nil {
 		sender = *req.Sender
 	}
-	tx, err := ProxyRepo(r).Get(destChain.ChainID).RedeemFungible(types.FungibleRedeemParams{
+
+	params := types.FungibleRedeemParams{
 		TokenChain: *destChain,
 		Amount:     event.Amount,
 		Receiver:   event.Receiver,
 		Sender:     sender,
 		TxHash:     req.TxHash,
 		EventIndex: *req.EventIndex,
-	})
+	}
+
+	if req.RawTxData != nil {
+		rawTxData, err := hexutil.Decode(*req.RawTxData)
+		if err != nil {
+			return
+		}
+
+		params.RawTxData = &rawTxData
+	}
+
+	tx, err := ProxyRepo(r).Get(destChain.ChainID).RedeemFungible(params)
 	if err != nil {
 		renderRedeemError(w, r, err)
 		return
@@ -154,7 +167,8 @@ func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resource
 	if req.Sender != nil {
 		sender = *req.Sender
 	}
-	tx, err := ProxyRepo(r).Get(destChain.ChainID).RedeemNonFungible(types.NonFungibleRedeemParams{
+
+	params := types.NonFungibleRedeemParams{
 		TokenChain: *destChain,
 		Receiver:   event.Receiver,
 		Sender:     sender,
@@ -162,7 +176,18 @@ func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resource
 		EventIndex: *req.EventIndex,
 		NftId:      event.NftId,
 		NftUri:     *uri,
-	})
+	}
+
+	if req.RawTxData != nil {
+		rawTxData, err := hexutil.Decode(*req.RawTxData)
+		if err != nil {
+			return
+		}
+
+		params.RawTxData = &rawTxData
+	}
+
+	tx, err := ProxyRepo(r).Get(destChain.ChainID).RedeemNonFungible(params)
 	if err != nil {
 		renderRedeemError(w, r, err)
 		return
@@ -253,6 +278,16 @@ func renderRedeemError(w http.ResponseWriter, r *http.Request, err error) {
 			Status: fmt.Sprintf("%d", http.StatusBadRequest),
 			Detail: "already redeemed",
 			Code:   "already_redeemed",
+		})
+		return
+	}
+	if err == types.ErrWrongSignedTx {
+		Log(r).WithError(err).Debug("wrong signed tx")
+		ape.RenderErr(w, &jsonapi.ErrorObject{
+			Title:  http.StatusText(http.StatusBadRequest),
+			Status: fmt.Sprintf("%d", http.StatusBadRequest),
+			Detail: "Params that was provided in transaction for signing and in event is different",
+			Code:   "wrong_signed_tx",
 		})
 		return
 	}
