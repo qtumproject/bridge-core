@@ -3,10 +3,10 @@ package comfig
 import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	sentryhook "github.com/xr9kayu/logrus/sentry"
 	"gitlab.com/distributed_lab/figure"
 	"gitlab.com/distributed_lab/kit/kv"
 	"gitlab.com/distributed_lab/logan/v3"
+	sentryhook "gitlab.com/distributed_lab/logan/v3/hook/sentry"
 )
 
 type Logger interface {
@@ -44,11 +44,9 @@ func (l *logger) Log() *logan.Entry {
 			sentry := sentrier.Sentry()
 			sentryConfig := sentrier.SentryConfig()
 
-			var selectedLevel logrus.Level
+			selectedLevel := logrus.Level(config.Level)
 			if sentryConfig.Level != nil {
 				selectedLevel = logrus.Level(*sentryConfig.Level)
-			} else {
-				selectedLevel = logrus.Level(config.Level)
 			}
 			levels := make([]logrus.Level, 0)
 			for level := logrus.PanicLevel; level <= selectedLevel; level++ {

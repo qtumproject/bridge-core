@@ -18,6 +18,7 @@ func Chains(w http.ResponseWriter, r *http.Request) {
 	}
 
 	chainsQ := ChainsQ(r)
+
 	if len(request.FilterType) > 0 {
 		chainsQ.FilterByType(request.FilterType...)
 	}
@@ -27,7 +28,6 @@ func Chains(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
-
 	var tokens []data.Token
 	if request.IncludeTokens {
 		tokens, err = TokensQ(r).FilterByID(tokensId(chains)...).Select()

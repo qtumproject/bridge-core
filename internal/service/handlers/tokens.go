@@ -27,7 +27,6 @@ func Tokens(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
-
 	var chains []data.Chain
 	if request.IncludeChains {
 		chains, err = ChainsQ(r).FilterByID(chainsId(tokens)...).Select()

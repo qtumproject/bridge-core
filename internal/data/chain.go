@@ -9,7 +9,6 @@ type ChainsQ interface {
 	New() ChainsQ
 	Select() ([]Chain, error)
 	Get() (*Chain, error)
-
 	FilterByID(ids ...string) ChainsQ
 	FilterByType(types ...resources.ChainType) ChainsQ
 }
@@ -21,7 +20,6 @@ type Chain struct {
 	Type        resources.ChainType `fig:"type,required"`
 	ChainParams json.RawMessage     `fig:"chain_params"`
 
-	Confirmations  int    `fig:"confirmations,required"`
 	BridgeContract string `fig:"bridge_contract,required"`
 	RpcEndpoint    string `fig:"rpc_endpoint,required"`
 	// Relation

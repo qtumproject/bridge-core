@@ -67,3 +67,14 @@ func (q *tokensQ) filter(token data.Token) bool {
 
 	return true
 }
+
+func (q *tokensQ) PageTokens(token data.Token) data.TokensQ {
+	result := make([]data.Token, 0, len(q.tokens))
+	//todo add pagination
+	for _, token := range q.tokens {
+		if q.filter(token) {
+			result = append(result, token)
+		}
+	}
+	return q
+}
