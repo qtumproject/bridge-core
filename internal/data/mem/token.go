@@ -1,10 +1,8 @@
 package mem
 
 import (
-	"fmt"
 	"gitlab.com/tokend/bridge/core/internal/data"
 	"gitlab.com/tokend/bridge/core/resources"
-	"strconv"
 )
 
 func NewTokenQ(tokens []data.Token) data.TokensQ {
@@ -79,33 +77,4 @@ func (q *tokensQ) PageTokens(token data.Token) data.TokensQ {
 		}
 	}
 	return q
-}
-
-func (q *tokensQ) Page(limitStr, currentPageStr, path string, tokens []data.Token) (data.TokensQList, error) {
-	list := data.TokensQList{}
-	limit, err := strconv.Atoi(limitStr)
-	currentPage, err := strconv.Atoi(currentPageStr)
-	if err != nil {
-		return list, err
-	}
-	if limit == 0 {
-		limit = 15
-	}
-	if currentPage < 1 {
-		currentPage = 1
-	}
-
-	firstEntry := (currentPage - 1) * limit
-	lastEntry := firstEntry + limit
-
-	if lastEntry > len(tokens) {
-		lastEntry = len(tokens)
-	}
-	list.Items = tokens[firstEntry:lastEntry]
-	//index := strings.Index(path, "?") //
-	//rootPath := path[:index]
-
-	list.NextPageID = fmt.Sprint(path, "?page[page_number]=", currentPage+1) //todo add link
-
-	return list, nil
 }

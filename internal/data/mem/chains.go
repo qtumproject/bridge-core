@@ -1,17 +1,8 @@
 package mem
 
 import (
-	"fmt"
 	"gitlab.com/tokend/bridge/core/internal/data"
 	"gitlab.com/tokend/bridge/core/resources"
-	"strconv"
-)
-
-const (
-	// OrderTypeAsc means result should be sorted in ascending order.
-	OrderTypeAsc = "asc"
-	// OrderTypeDesc means result should be sorted in descending order.
-	OrderTypeDesc = "desc"
 )
 
 func NewChainsQ(chains []data.Chain) data.ChainsQ {
@@ -75,34 +66,4 @@ func (q *chainsQ) filter(value data.Chain) bool {
 	}
 
 	return true
-}
-
-// Return each page content
-func (q *chainsQ) Page(limitStr, currentPageStr, path string, chains []data.Chain) (data.ChainsQList, error) {
-	list := data.ChainsQList{}
-	limit, err := strconv.Atoi(limitStr)
-	currentPage, err := strconv.Atoi(currentPageStr)
-	if err != nil {
-		return list, err
-	}
-	if limit == 0 {
-		limit = 15
-	}
-	if currentPage < 1 {
-		currentPage = 1
-	}
-
-	firstEntry := (currentPage - 1) * limit
-	lastEntry := firstEntry + limit
-
-	if lastEntry > len(chains) {
-		lastEntry = len(chains)
-	}
-	list.Items = chains[firstEntry:lastEntry]
-	//index := strings.Index(path, "?") //
-	//rootPath := path[:index]
-
-	list.NextPageID = fmt.Sprint(path, "?page[page_number]=", currentPage+1) //todo add link
-
-	return list, nil
 }

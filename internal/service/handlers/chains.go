@@ -28,12 +28,6 @@ func Chains(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
-	chainsPage, err := chainsQ.Page(r.URL.Query().Get("limit"), r.URL.Query().Get("page_number"), r.URL.Path, chains)
-	if err != nil {
-		Log(r).WithError(err).Error("failed to pagination")
-		ape.RenderErr(w, problems.InternalError())
-		return
-	}
 	var tokens []data.Token
 	if request.IncludeTokens {
 		tokens, err = TokensQ(r).FilterByID(tokensId(chains)...).Select()
@@ -44,8 +38,7 @@ func Chains(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	ape.Render(w, models.NewChainsResponse(chainsPage, tokens)) //todo change docs and add new response model
-	//ape.Render(w, models.NewChainListResponse(chainsPage.Items, tokens)) //todo change docs and add new response model
+	ape.Render(w, models.NewChainListResponse(chains, tokens))
 }
 
 func tokensId(chains []data.Chain) []string {

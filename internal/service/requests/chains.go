@@ -2,7 +2,6 @@ package requests
 
 import (
 	"gitlab.com/distributed_lab/urlval"
-	"gitlab.com/tokend/bridge/core/internal/data"
 	"gitlab.com/tokend/bridge/core/resources"
 	"net/http"
 )
@@ -10,11 +9,6 @@ import (
 type ChainsRequest struct {
 	FilterType    []resources.ChainType `filter:"chain_type"`
 	IncludeTokens bool                  `include:"token"`
-}
-
-type ChainsResponse struct { //todo delete this struct
-	Data     data.ChainsQList
-	Included resources.Included
 }
 
 func NewChainsRequest(r *http.Request) (ChainsRequest, error) {
