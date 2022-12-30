@@ -2,7 +2,6 @@ package evm
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
@@ -65,9 +64,13 @@ func (p *evmProxy) getTxReceipt(txHash string) (*ethTypes.Receipt, error) {
 		return nil, types.ErrTxFailed
 	}
 
-	err = p.getTxFinality(receipt)
+	height, err := p.client.BlockNumber(context.TODO())
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to get current blockchain height")
+	}
+	// -1 because including in block mean already one confirmation
+	if receipt.BlockNumber.Uint64()+uint64(p.confirmations-1) > height {
+		return nil, types.ErrTxNotConfirmed
 	}
 
 	return receipt, nil
@@ -181,40 +184,4 @@ func getBridgeEvent(dest interface{}, logName string, eventIndex int, receipt *e
 	}
 
 	return types.ErrEventNotFound
-}
-
-type Blocks struct {
-	block ethTypes.Block
-}
-
-func (p *evmProxy) getTxFinality(tx *ethTypes.Receipt) error {
-
-	abi, err := bridge.BridgeMetaData.GetAbi()
-	if err != nil {
-		return errors.Wrap(err, "failed to parse bridge ABI")
-	}
-	contract := bind.NewBoundContract(common.Address{}, *abi, nil, nil, nil)
-
-	var blockI []interface{}
-	var block Blocks
-	co := new(bind.CallOpts)
-
-	err = contract.Call(co, &blockI, "eth_getBlock", "safe")
-	if err != nil {
-		return errors.Wrap(err, "failed to get safe block")
-	}
-	responseJSON, err := json.Marshal(blockI)
-	if err != nil {
-		return errors.Wrap(err, "failed to parse eth_getBlock")
-	}
-
-	err = json.Unmarshal(responseJSON, &block)
-	if err != nil {
-		return errors.Wrap(err, "failed to unmarshal eth_getBlock")
-	}
-
-	if block.block.Number().Uint64() > tx.BlockNumber.Uint64() {
-		return nil
-	}
-	return types.ErrTxNotConfirmed
 }
