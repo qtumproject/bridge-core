@@ -182,6 +182,7 @@ func TestDB(t *testing.T) {
 func TestMath(t *testing.T) {
 	cases := []struct {
 		A, B Amount
+		BInt int64
 		Add  string
 		Sub  string
 		Mul  string
@@ -189,13 +190,14 @@ func TestMath(t *testing.T) {
 		Pow  string
 	}{
 		{
-			A:   MustNewFromString("3"),
-			B:   MustNewFromString("2"),
-			Add: "5.000000000000000000",
-			Sub: "1.000000000000000000",
-			Mul: "6.000000000000000000",
-			Div: "1.500000000000000000",
-			Pow: "9.000000000000000000",
+			A:    MustNewFromString("3"),
+			B:    MustNewFromString("2"),
+			BInt: 2,
+			Add:  "5.000000000000000000",
+			Sub:  "1.000000000000000000",
+			Mul:  "6.000000000000000000",
+			Div:  "1.500000000000000000",
+			Pow:  "9.000000000000000000",
 		},
 	}
 
@@ -222,6 +224,18 @@ func TestMath(t *testing.T) {
 			a := Sum(c.B, c.A)
 			if a.String() != c.Add {
 				t.Fatalf("expected %s, got %s", c.Add, a.String())
+			}
+		})
+		t.Run(fmt.Sprintf("%s/%s", c.A.String(), c.B.String()), func(t *testing.T) {
+			a := Div(c.A, c.B)
+			if a.String() != c.Div {
+				t.Fatalf("expected %s, got %s", c.Div, a.String())
+			}
+		})
+		t.Run(fmt.Sprintf("%s^%s", c.A.String(), c.B.String()), func(t *testing.T) {
+			a := Pow(c.A, c.BInt)
+			if a.String() != c.Pow {
+				t.Fatalf("expected %s, got %s", c.Pow, a.String())
 			}
 		})
 	}
