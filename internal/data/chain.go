@@ -23,6 +23,7 @@ type Chain struct {
 	BridgeContract string `fig:"bridge_contract,required"`
 	RpcEndpoint    string `fig:"rpc_endpoint,required"`
 	Confirmations  int    `fig:"confirmations,required"`
+	ProxyURL       string `fig:"proxy_url"`
 	// Relation
 	Tokens []TokenChain
 }
