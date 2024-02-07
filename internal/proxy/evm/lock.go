@@ -3,6 +3,7 @@ package evm
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"gitlab.com/distributed_lab/logan/v3/errors"
+	"gitlab.com/tokend/bridge/core/internal/proxy/evm/enums"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
 	"math/big"
 )
@@ -53,7 +54,7 @@ func (p *evmProxy) lockErc20(params types.FungibleLockParams) (interface{}, erro
 		params.Amount.IntWithPrecision(decimals),
 		params.Receiver,
 		params.DestinationChain,
-		isWrappedToken(params.TokenChain.BridgingType),
+		uint8(enums.ToErc20BridgingType(params.TokenChain.BridgingType)),
 	)
 
 	return encodeTx(tx, senderAddr, p.chainID, params.TokenChain.ChainID, nil)
@@ -71,7 +72,7 @@ func (p *evmProxy) lockErc721(params types.NonFungibleLockParams) (interface{}, 
 		tokenId,
 		params.Receiver,
 		params.DestinationChain,
-		isWrappedToken(params.TokenChain.BridgingType),
+		uint8(enums.ToErc721BridgingType(params.TokenChain.BridgingType)),
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to build deposit erc721 transaction")
@@ -94,7 +95,7 @@ func (p *evmProxy) lockErc1155(params types.NonFungibleLockParams) (interface{},
 		big.NewInt(1),
 		params.Receiver,
 		params.DestinationChain,
-		isWrappedToken(params.TokenChain.BridgingType),
+		uint8(enums.ToErc1155BridgingType(params.TokenChain.BridgingType)),
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to build deposit erc1155 transaction")

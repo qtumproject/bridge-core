@@ -24,4 +24,5 @@ type BridgingType string
 const (
 	BridgingTypeLP      BridgingType = "liquidity_pool"
 	BridgingTypeWrapped BridgingType = "wrapped"
+	BridgeTypeUSDC      BridgingType = "usdc"
 )

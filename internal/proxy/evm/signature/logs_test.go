@@ -3,6 +3,8 @@ package signature
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"gitlab.com/tokend/bridge/core/internal/data"
+	"gitlab.com/tokend/bridge/core/internal/proxy/evm/enums"
 	"math/big"
 	"testing"
 )
@@ -28,20 +30,21 @@ func TestNativeLog(t *testing.T) {
 }
 
 func TestErc20Log(t *testing.T) {
-	expectedResult := "0x8d731a2ffef3ab1b31560b622ea11072b21835c2cb5c4df77b23f30711541eff"
+	expectedResult := "0x384f9cbeb9f719bd7a883505ae21aef2ab7608b1ff7c54658dcba5bca69b860d"
 
 	am, _ := big.NewInt(0).SetString("100000000000000000000", 10)
 	log := Erc20Log{
-		TokenAddress: "0x26B862f640357268Bd2d9E95bc81553a2Aa81D7E",
+		TokenAddress: "0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44",
 		Amount:       am,
 		Receiver:     "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
 		TxHash:       common.HexToHash("0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d"),
 		EventIndex:   1794147,
 		ChainID:      big.NewInt(31378),
-		IsWrapped:    true,
+		BridgingType: enums.ToErc20BridgingType(data.BridgingTypeWrapped),
 	}
 
 	hash := hexutil.Encode(log.Hash())
+	println(hash)
 
 	if hash != expectedResult {
 		t.Log(hash)
@@ -50,17 +53,17 @@ func TestErc20Log(t *testing.T) {
 }
 
 func TestErc721Log(t *testing.T) {
-	expectedResult := "0x66d0f2f121e882581235c708b3bf5ce9f8e45724d9c78ab7c7d1fa284b32970e"
+	expectedResult := "0x1bf4a3053a90252cfa79d72727d1cd31f8c04de8ba416cf7153ce0632f542bdc"
 
 	log := Erc721Log{
-		TokenAddress: "0xc7cDb7A2E5dDa1B7A0E792Fe1ef08ED20A6F56D4",
+		TokenAddress: "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690",
 		TokenID:      big.NewInt(5000),
 		Receiver:     "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
 		TxHash:       common.HexToHash("0xc4f46c912cc2a1f30891552ac72871ab0f0e977886852bdd5dccd221a595647d"),
 		EventIndex:   1794147,
 		ChainID:      big.NewInt(31378),
 		TokenUri:     "https://some.link",
-		IsWrapped:    true,
+		BridgingType: enums.ToErc721BridgingType(data.BridgingTypeWrapped),
 	}
 
 	hash := hexutil.Encode(log.Hash())
@@ -72,10 +75,10 @@ func TestErc721Log(t *testing.T) {
 }
 
 func TestErc1155Log(t *testing.T) {
-	expectedResult := "0xd0e3a90c86f4b3cfbe244401f01264fd5f3ce096c0caa1529328897f1fc5c122"
+	expectedResult := "0x64905dbe4e25d5915269edc98c27cab61b147d4ccf4e0e0b8dba20830a81f6a3"
 
 	log := Erc1155Log{
-		TokenAddress: "0xCace1b78160AE76398F486c8a18044da0d66d86D",
+		TokenAddress: "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
 		TokenID:      big.NewInt(5000),
 		Amount:       big.NewInt(10),
 		Receiver:     "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -83,7 +86,7 @@ func TestErc1155Log(t *testing.T) {
 		EventIndex:   1794147,
 		ChainID:      big.NewInt(31378),
 		TokenUri:     "https://some.link",
-		IsWrapped:    true,
+		BridgingType: enums.ToErc1155BridgingType(data.BridgingTypeWrapped),
 	}
 
 	hash := hexutil.Encode(log.Hash())
