@@ -8,6 +8,7 @@ import (
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/bridge/core/internal/amount"
 	"gitlab.com/tokend/bridge/core/internal/data"
+	"gitlab.com/tokend/bridge/core/internal/proxy/evm/enums"
 	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/bridge"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
 )
@@ -99,7 +100,7 @@ func (p *evmProxy) checkErc20LockEvent(receipt *ethTypes.Receipt, eventIndex int
 	if !compareAddresses(log.Token, common.HexToAddress(*tokenChain.ContractAddress)) {
 		return nil, types.ErrWrongToken
 	}
-	if log.IsWrapped && tokenChain.BridgingType != data.BridgingTypeWrapped {
+	if enums.Erc20BridgingType(log.OperationType) != enums.ToErc20BridgingType(tokenChain.BridgingType) {
 		return nil, types.ErrWrongLockEvent
 	}
 
@@ -126,7 +127,7 @@ func (p *evmProxy) checkErc721LockEvent(receipt *ethTypes.Receipt, eventIndex in
 	if !compareAddresses(log.Token, tokenAddress) {
 		return nil, types.ErrWrongToken
 	}
-	if log.IsWrapped && tokenChain.BridgingType != data.BridgingTypeWrapped {
+	if enums.Erc721BridgingType(log.OperationType) != enums.ToErc721BridgingType(tokenChain.BridgingType) {
 		return nil, types.ErrWrongLockEvent
 	}
 
@@ -148,7 +149,7 @@ func (p *evmProxy) checkErc1155LockEvent(receipt *ethTypes.Receipt, eventIndex i
 	if !compareAddresses(log.Token, tokenAddress) {
 		return nil, types.ErrWrongToken
 	}
-	if log.IsWrapped && tokenChain.BridgingType != data.BridgingTypeWrapped {
+	if enums.Erc1155BridgingType(log.OperationType) != enums.ToErc1155BridgingType(tokenChain.BridgingType) {
 		return nil, types.ErrWrongLockEvent
 	}
 	if log.Amount.Uint64() != 1 {
