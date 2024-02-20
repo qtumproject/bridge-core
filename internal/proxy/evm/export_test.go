@@ -9,11 +9,13 @@ import (
 )
 
 func ExportCheckTxDataAndSign(p proxytypes.Proxy) func(opts *bind.TransactOpts, tx *types.Transaction, rawData []byte) (*types.Transaction, int64, error) {
-	return p.(*evmProxy).checkTxDataAndSign
+	rawProxy := p.(*evmProxy)
+	return rawProxy.checkTxDataAndSign
 }
 
 func ExportRedeemNative(p proxytypes.Proxy) func(params proxytypes.FungibleRedeemParams, sender common.Address) (*types.Transaction, error) {
-	return p.(*evmProxy).redeemNative
+	rawProxy := p.(*evmProxy)
+	return rawProxy.redeemNative
 }
 
 func ExportBuildTxOpts() func(from common.Address) *bind.TransactOpts {

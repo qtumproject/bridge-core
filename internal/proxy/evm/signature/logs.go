@@ -3,6 +3,7 @@ package signature
 import (
 	"github.com/ethereum/go-ethereum/common"
 	sha3 "github.com/miguelmota/go-solidity-sha3"
+	"gitlab.com/tokend/bridge/core/internal/proxy/evm/enums"
 	"math/big"
 )
 
@@ -31,7 +32,7 @@ type Erc20Log struct {
 	TxHash       common.Hash
 	EventIndex   int
 	ChainID      *big.Int
-	IsWrapped    bool
+	BridgingType enums.Erc20BridgingType
 }
 
 func (log Erc20Log) Hash() []byte {
@@ -42,7 +43,7 @@ func (log Erc20Log) Hash() []byte {
 		sha3.Bytes32(log.TxHash.String()),
 		sha3.Uint256(big.NewInt(int64(log.EventIndex))),
 		sha3.Uint256(log.ChainID),
-		sha3.Bool(log.IsWrapped),
+		sha3.Uint8(uint8(log.BridgingType)),
 	)
 }
 
@@ -54,7 +55,7 @@ type Erc721Log struct {
 	EventIndex   int
 	ChainID      *big.Int
 	TokenUri     string
-	IsWrapped    bool
+	BridgingType enums.Erc721BridgingType
 }
 
 func (log Erc721Log) Hash() []byte {
@@ -66,7 +67,7 @@ func (log Erc721Log) Hash() []byte {
 		sha3.Uint256(big.NewInt(int64(log.EventIndex))),
 		sha3.Uint256(log.ChainID),
 		sha3.String(log.TokenUri),
-		sha3.Bool(log.IsWrapped),
+		sha3.Uint8(uint8(log.BridgingType)),
 	)
 }
 
@@ -79,7 +80,7 @@ type Erc1155Log struct {
 	EventIndex   int
 	ChainID      *big.Int
 	TokenUri     string
-	IsWrapped    bool
+	BridgingType enums.Erc1155BridgingType
 }
 
 func (log Erc1155Log) Hash() []byte {
@@ -92,6 +93,6 @@ func (log Erc1155Log) Hash() []byte {
 		sha3.Uint256(big.NewInt(int64(log.EventIndex))),
 		sha3.Uint256(log.ChainID),
 		sha3.String(log.TokenUri),
-		sha3.Bool(log.IsWrapped),
+		sha3.Uint8(uint8(log.BridgingType)),
 	)
 }
