@@ -6,8 +6,9 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/pkg/errors"
-	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/bridge"
+	"gitlab.com/tokend/bridge/core/internal/proxy/evm/enums"
 	"gitlab.com/tokend/bridge/core/internal/proxy/evm/signature"
+	"gitlab.com/tokend/bridge/core/internal/proxy/qtum/generated/bridge"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
 	"math/big"
 	"net/http"
@@ -162,7 +163,7 @@ func (p *evmProxy) redeemErc20(params types.FungibleRedeemParams, sender common.
 		TxHash:       txHash,
 		EventIndex:   params.EventIndex,
 		ChainID:      p.chainID,
-		IsWrapped:    isWrappedToken(params.TokenChain.BridgingType),
+		BridgingType: enums.ToErc20BridgingType(params.TokenChain.BridgingType),
 	}
 	sign, err := p.signer.Sign(&log)
 	if err != nil {
@@ -175,7 +176,7 @@ func (p *evmProxy) redeemErc20(params types.FungibleRedeemParams, sender common.
 		common.HexToAddress(params.Receiver),
 		txHash,
 		big.NewInt(int64(params.EventIndex)),
-		log.IsWrapped,
+		uint8(log.BridgingType),
 		[][]byte{sign},
 	)
 }
@@ -195,7 +196,7 @@ func (p *evmProxy) redeemErc721(params types.NonFungibleRedeemParams, sender com
 		EventIndex:   params.EventIndex,
 		ChainID:      p.chainID,
 		TokenUri:     params.NftUri,
-		IsWrapped:    isWrappedToken(params.TokenChain.BridgingType),
+		BridgingType: enums.ToErc721BridgingType(params.TokenChain.BridgingType),
 	}
 	sign, err := p.signer.Sign(&log)
 	if err != nil {
@@ -209,7 +210,7 @@ func (p *evmProxy) redeemErc721(params types.NonFungibleRedeemParams, sender com
 		txHash,
 		big.NewInt(int64(params.EventIndex)),
 		params.NftUri,
-		log.IsWrapped,
+		uint8(log.BridgingType),
 		[][]byte{sign},
 	)
 }
@@ -231,7 +232,7 @@ func (p *evmProxy) redeemErc1155(params types.NonFungibleRedeemParams, sender co
 		EventIndex:   params.EventIndex,
 		ChainID:      p.chainID,
 		TokenUri:     params.NftUri,
-		IsWrapped:    isWrappedToken(params.TokenChain.BridgingType),
+		BridgingType: enums.ToErc1155BridgingType(params.TokenChain.BridgingType),
 	}
 	sign, err := p.signer.Sign(&log)
 	if err != nil {
@@ -246,7 +247,7 @@ func (p *evmProxy) redeemErc1155(params types.NonFungibleRedeemParams, sender co
 		txHash,
 		big.NewInt(int64(params.EventIndex)),
 		params.NftUri,
-		log.IsWrapped,
+		uint8(log.BridgingType),
 		[][]byte{sign},
 	)
 }

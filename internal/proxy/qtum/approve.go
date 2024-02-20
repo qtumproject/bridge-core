@@ -6,9 +6,9 @@ import (
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/bridge/core/internal/data"
-	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/erc1155"
-	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/erc20"
-	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/erc721"
+	"gitlab.com/tokend/bridge/core/internal/proxy/qtum/generated/erc1155"
+	"gitlab.com/tokend/bridge/core/internal/proxy/qtum/generated/erc20"
+	"gitlab.com/tokend/bridge/core/internal/proxy/qtum/generated/erc721"
 	"math/big"
 )
 

@@ -8,8 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"gitlab.com/distributed_lab/logan/v3/errors"
-	"gitlab.com/tokend/bridge/core/internal/data"
-	"gitlab.com/tokend/bridge/core/internal/proxy/evm/generated/erc20"
+	"gitlab.com/tokend/bridge/core/internal/proxy/qtum/generated/erc20"
 	"gitlab.com/tokend/bridge/core/resources"
 	"math/big"
 	"strings"
@@ -47,17 +46,6 @@ func buildTransactOptsWithValue(from common.Address, value *big.Int) *bind.Trans
 
 func compareAddresses(a, b common.Address) bool {
 	return strings.ToLower(a.String()) == strings.ToLower(b.String())
-}
-
-func isWrappedToken(bridgingType data.BridgingType) bool {
-	switch bridgingType {
-	case data.BridgingTypeWrapped:
-		return true
-	case data.BridgingTypeLP:
-		return false
-	default:
-		panic("unsupported bridging type")
-	}
 }
 
 func skipSig(address common.Address, transaction *types.Transaction) (*types.Transaction, error) {
