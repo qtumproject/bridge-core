@@ -25,13 +25,21 @@ type ipfsClienter struct {
 func (c *ipfsClienter) IpfsClient() Client {
 	return c.once.Do(func() interface{} {
 		config := struct {
-			Endpoint string `fig:"endpoint,required"`
-		}{}
+			Endpoint string `fig:"endpoint"`
+		}{
+			Endpoint: "https://ipfs.io",
+		}
 
-		err := figure.
+		value, err := c.getter.GetStringMap("ipfs")
+		if err != nil {
+			// Data not presented use default
+			value = map[string]interface{}{}
+		}
+
+		err = figure.
 			Out(&config).
 			With(figure.BaseHooks).
-			From(kv.MustGetStringMap(c.getter, "ipfs")).
+			From(value).
 			Please()
 		if err != nil {
 			panic(errors.Wrap(err, "failed to figure out ipfs"))

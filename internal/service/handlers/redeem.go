@@ -291,7 +291,7 @@ func renderRedeemError(w http.ResponseWriter, r *http.Request, err error) {
 		})
 		return
 	}
-	Log(r).WithError(err).Error("failed to check fungible lock event")
+	Log(r).WithError(err).Error("failed to redeem token")
 	ape.RenderErr(w, problems.InternalError())
 	return
 }
