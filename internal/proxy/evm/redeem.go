@@ -1,7 +1,6 @@
 package evm
 
 import (
-	"context"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
@@ -251,14 +250,8 @@ func (p *evmProxy) redeemErc1155(params types.NonFungibleRedeemParams, sender co
 }
 
 func (p *evmProxy) sendTx(tx *ethTypes.Transaction, chain string) (interface{}, error) {
-	tx, err := p.signer.SignTx(tx, p.chainID)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to sign tx")
-	}
-
-	err = p.client.SendTransaction(context.TODO(), tx)
-
-	return encodeProcessedTx(tx.Hash(), chain), errors.Wrap(err, "failed to send tx")
+	hash, err := p.relayer.SendTx(tx, p.chainID)
+	return encodeProcessedTx(hash, chain), errors.Wrap(err, "failed to send tx")
 }
 
 func (p *evmProxy) getThreshold() (int64, error) {
