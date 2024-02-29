@@ -5,6 +5,7 @@ import (
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/distributed_lab/logan/v3/errors"
+	"gitlab.com/tokend/bridge/core/internal/proxy/types"
 	"gitlab.com/tokend/bridge/core/internal/service/models"
 	"gitlab.com/tokend/bridge/core/internal/service/requests"
 	"net/http"
@@ -35,7 +36,12 @@ func Approve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tx, err := ProxyRepo(r).Get(tokenChain.ChainID).Approve(*tokenChain, req.Address)
+	tx, err := ProxyRepo(r).Get(tokenChain.ChainID).Approve(types.ApproveParams{
+		TokenChain:  *tokenChain,
+		ApproveFrom: req.Address,
+		Amount:      req.Amount,
+		NftId:       req.NftId,
+	})
 	if err != nil {
 		Log(r).WithError(err).Error("failed to approve")
 		ape.RenderErr(w, problems.InternalError())

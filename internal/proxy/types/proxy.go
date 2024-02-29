@@ -17,7 +17,7 @@ var ErrNotFound = errors.New("not found")
 var ErrWrongSignedTx = errors.New("signed tx does not match tx log")
 
 type Proxy interface {
-	Approve(tokenChain data.TokenChain, approveFrom string) (interface{}, error)
+	Approve(params ApproveParams) (interface{}, error)
 	LockFungible(params FungibleLockParams) (interface{}, error)
 	LockNonFungible(params NonFungibleLockParams) (interface{}, error)
 	CheckFungibleLockEvent(txHash string, eventIndex int, tokenChain data.TokenChain) (*FungibleLockEvent, error)
@@ -33,6 +33,13 @@ type Proxy interface {
 	BridgeBalance(tokenChain data.TokenChain, nftId *string) (amount.Amount, error)
 	GetNftMetadataUri(tokenChain data.TokenChain, nftId string) (string, error)
 	GetNftMetadata(tokenChain data.TokenChain, nftId string) (*NftMetadata, error)
+}
+
+type ApproveParams struct {
+	TokenChain  data.TokenChain
+	ApproveFrom string
+	Amount      *amount.Amount
+	NftId       *string
 }
 
 type FungibleLockParams struct {

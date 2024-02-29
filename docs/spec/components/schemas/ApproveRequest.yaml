@@ -10,3 +10,11 @@ properties:
     type: string
   token_id:
     type: string
+  amount:
+    type: string
+    format: amount.Amount
+    description: amount of token to transfer, should be presented only for fungible tokens transfer
+    example: "0.001"
+  nft_id:
+    type: string
+    description: id of NFT to transfer, should be presented only for NFT transfer
