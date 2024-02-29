@@ -79,7 +79,7 @@ func (p *evmProxy) getTxReceipt(txHash string) (*ethTypes.Receipt, error) {
 
 func (p *evmProxy) checkNativeLockEvent(receipt *ethTypes.Receipt, eventIndex int) (*types.FungibleLockEvent, error) {
 	var log bridge.BridgeDepositedNative
-	err := getBridgeEvent(&log, depositedNativeEventName, eventIndex, receipt)
+	err := getBridgeEvent(&log, depositedNativeEventName, eventIndex, receipt, p.bridgeContract)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (p *evmProxy) checkNativeLockEvent(receipt *ethTypes.Receipt, eventIndex in
 
 func (p *evmProxy) checkErc20LockEvent(receipt *ethTypes.Receipt, eventIndex int, tokenChain data.TokenChain) (*types.FungibleLockEvent, error) {
 	var log bridge.BridgeDepositedERC20
-	err := getBridgeEvent(&log, depositedERC20EventName, eventIndex, receipt)
+	err := getBridgeEvent(&log, depositedERC20EventName, eventIndex, receipt, p.bridgeContract)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (p *evmProxy) checkErc20LockEvent(receipt *ethTypes.Receipt, eventIndex int
 
 func (p *evmProxy) checkErc721LockEvent(receipt *ethTypes.Receipt, eventIndex int, tokenChain data.TokenChain) (*types.NonFungibleLockEvent, error) {
 	var log bridge.BridgeDepositedERC721
-	err := getBridgeEvent(&log, depositedERC721EventName, eventIndex, receipt)
+	err := getBridgeEvent(&log, depositedERC721EventName, eventIndex, receipt, p.bridgeContract)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (p *evmProxy) checkErc721LockEvent(receipt *ethTypes.Receipt, eventIndex in
 
 func (p *evmProxy) checkErc1155LockEvent(receipt *ethTypes.Receipt, eventIndex int, tokenChain data.TokenChain) (*types.NonFungibleLockEvent, error) {
 	var log bridge.BridgeDepositedERC1155
-	err := getBridgeEvent(&log, depositedERC1155EventName, eventIndex, receipt)
+	err := getBridgeEvent(&log, depositedERC1155EventName, eventIndex, receipt, p.bridgeContract)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func (p *evmProxy) checkErc1155LockEvent(receipt *ethTypes.Receipt, eventIndex i
 	}, nil
 }
 
-func getBridgeEvent(dest interface{}, logName string, eventIndex int, receipt *ethTypes.Receipt) error {
+func getBridgeEvent(dest interface{}, logName string, eventIndex int, receipt *ethTypes.Receipt, source common.Address) error {
 	abi, err := bridge.BridgeMetaData.GetAbi()
 	if err != nil {
 		return errors.Wrap(err, "failed to parse bridge ABI")
@@ -173,6 +173,10 @@ func getBridgeEvent(dest interface{}, logName string, eventIndex int, receipt *e
 	index := 0
 	for _, l := range receipt.Logs {
 		if l == nil {
+			continue
+		}
+		if !compareAddresses(l.Address, source) {
+			// Event from another contract
 			continue
 		}
 		err := contract.UnpackLog(dest, logName, *l)
