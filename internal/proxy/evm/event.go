@@ -152,14 +152,13 @@ func (p *evmProxy) checkErc1155LockEvent(receipt *ethTypes.Receipt, eventIndex i
 	if enums.Erc1155BridgingType(log.OperationType) != enums.ToErc1155BridgingType(tokenChain.BridgingType) {
 		return nil, types.ErrWrongLockEvent
 	}
-	if log.Amount.Uint64() != 1 {
-		return nil, types.ErrWrongLockEvent
-	}
 
+	am := amount.NewFromIntWithPrecision(log.Amount, 0)
 	return &types.NonFungibleLockEvent{
 		Receiver:         log.Receiver,
 		DestinationChain: log.Network,
 		NftId:            log.TokenId.String(),
+		Amount:           &am,
 	}, nil
 }
 

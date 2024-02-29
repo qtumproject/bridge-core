@@ -176,6 +176,7 @@ func redeemNonFungibleToken(w http.ResponseWriter, r *http.Request, req resource
 		EventIndex: *req.EventIndex,
 		NftId:      event.NftId,
 		NftUri:     *uri,
+		Amount:     event.Amount,
 	}
 
 	if req.RawTxData != nil {

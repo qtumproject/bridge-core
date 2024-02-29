@@ -218,12 +218,11 @@ func (p *evmProxy) redeemErc1155(params types.NonFungibleRedeemParams, sender co
 	if !ok {
 		return nil, errors.New("failed to parse nft id")
 	}
-	amount := big.NewInt(1)
 
 	log := signature.Erc1155Log{
 		TokenAddress: *params.TokenChain.ContractAddress,
 		TokenID:      nftId,
-		Amount:       amount,
+		Amount:       params.Amount.IntWithPrecision(0),
 		Receiver:     params.Receiver,
 		TxHash:       txHash,
 		EventIndex:   params.EventIndex,
@@ -239,7 +238,7 @@ func (p *evmProxy) redeemErc1155(params types.NonFungibleRedeemParams, sender co
 	return p.bridge.WithdrawERC1155(buildTransactOpts(sender),
 		common.HexToAddress(*params.TokenChain.ContractAddress),
 		nftId,
-		amount,
+		params.Amount.IntWithPrecision(0),
 		common.HexToAddress(params.Receiver),
 		txHash,
 		big.NewInt(int64(params.EventIndex)),

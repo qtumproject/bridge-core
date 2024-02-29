@@ -68,6 +68,7 @@ type NonFungibleLockEvent struct {
 	Receiver         string
 	DestinationChain string
 	NftId            string
+	Amount           *amount.Amount
 }
 
 type FungibleRedeemParams struct {
@@ -88,5 +89,6 @@ type NonFungibleRedeemParams struct {
 	EventIndex int
 	NftId      string
 	NftUri     string
+	Amount     *amount.Amount
 	RawTxData  *[]byte
 }
