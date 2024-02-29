@@ -85,7 +85,7 @@ func (p *evmProxy) erc721Balance(tokenAddress string, address string, nftId stri
 func (p *evmProxy) erc1155Balance(tokenAddress string, address string, nftId string) (amount.Amount, error) {
 	token, err := erc1155.NewErc1155(common.HexToAddress(tokenAddress), p.client)
 	if err != nil {
-		return amount.Amount{}, errors.Wrap(err, "failed to create erc721 instance")
+		return amount.Amount{}, errors.Wrap(err, "failed to create erc1155 instance")
 	}
 
 	tokenId, ok := big.NewInt(0).SetString(nftId, 10)
