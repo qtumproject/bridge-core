@@ -1,8 +1,6 @@
-# Core
+# TokenE Bridge
 
-Core module is responsible for general bridging logic:
-- Track transactions
-- Tracking flows that weren’t finished and allowing users to continue or cancel them
-- Ingesting data about bridge events for faster access
+Multisignature cross chain bridge. Check out our [docs](https://docs.tokene.io/docs/category/tokene-bridge) for more info.
 
-Bridge Core DB will store data that it collects from smart contracts of different networks. All this data is also stored in blockchain, so could be restored easily.
+Bridge consists of off-chain oracle module and bridge smart contracts:
+- [EVM](https://github.com/dl-tokene/bridge-evm-contracts)
