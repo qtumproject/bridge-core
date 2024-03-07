@@ -64,9 +64,8 @@ func (p *evmProxy) approveErc20(tokenAddress common.Address, approveFrom common.
 		return nil, nil
 	}
 
-	amountToApprove := amount.Sub(requiredAmount, approvedAmount)
 	tx, err := token.Approve(buildTransactOpts(approveFrom), p.bridgeContract,
-		amountToApprove.IntWithPrecision(int(decimals)))
+		requiredAmount.IntWithPrecision(int(decimals)))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to build token approve tx")
 	}
