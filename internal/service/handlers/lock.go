@@ -9,6 +9,7 @@ import (
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/bridge/core/internal/amount"
 	"gitlab.com/tokend/bridge/core/internal/data"
+	"gitlab.com/tokend/bridge/core/internal/proxy/evm"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
 	"gitlab.com/tokend/bridge/core/internal/service/models"
 	"gitlab.com/tokend/bridge/core/internal/service/requests"
@@ -119,6 +120,23 @@ func Lock(w http.ResponseWriter, r *http.Request) {
 			})...)
 			return
 		}
+		if tokenChain.TokenType == evm.TokenTypeErc1155 {
+			if req.Amount == nil {
+				Log(r).WithError(err).Debug("amount is not set")
+				ape.RenderErr(w, problems.BadRequest(validation.Errors{
+					"data/amount": errors.New("amount is not set"),
+				})...)
+				return
+			}
+			if !req.Amount.IsInteger() {
+				Log(r).WithError(err).Debug("amount is not integer")
+				ape.RenderErr(w, problems.BadRequest(validation.Errors{
+					"data/amount": errors.New("amount is not integer"),
+				})...)
+				return
+			}
+		}
+
 		tx, err = ProxyRepo(r).Get(tokenChain.ChainID).LockNonFungible(types.NonFungibleLockParams{
 			TokenChain:       *tokenChain,
 			Sender:           req.Sender,

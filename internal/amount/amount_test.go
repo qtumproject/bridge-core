@@ -74,6 +74,34 @@ func TestToString(t *testing.T) {
 	}
 }
 
+func TestIsInteger(t *testing.T) {
+	cases := []struct {
+		amount Amount
+		result bool
+	}{
+		{
+			amount: MustNewFromString("1"),
+			result: true,
+		},
+		{
+			amount: MustNewFromString("0.1"),
+			result: false,
+		},
+		{
+			amount: MustNewFromString("1.23"),
+			result: false,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.amount.String(), func(t *testing.T) {
+			if c.amount.IsInteger() != c.result {
+				t.Fatalf("expected %s IsIntenger to be %t", c.amount.String(), c.result)
+			}
+		})
+	}
+}
+
 func TestJSONDecode(t *testing.T) {
 	cases := []struct {
 		amount string

@@ -49,6 +49,10 @@ func NewFromIntWithPrecision(v *big.Int, precision int) Amount {
 	return Amount(*i)
 }
 
+func (a Amount) IsInteger() bool {
+	return big.NewInt(0).Mod(a.Int(), One).Cmp(big.NewInt(0)) == 0
+}
+
 func (a Amount) Int() *big.Int {
 	i := big.Int(a)
 	return big.NewInt(0).Set(&i)
