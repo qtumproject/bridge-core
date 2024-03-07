@@ -125,6 +125,7 @@ func Lock(w http.ResponseWriter, r *http.Request) {
 			Receiver:         req.Receiver,
 			DestinationChain: req.ChainTo,
 			NftId:            *req.NftId,
+			Amount:           req.Amount,
 		})
 	default:
 		Log(r).Errorf("token type is not supported %s, token id - %s", token.Type, token.ID)

@@ -3,6 +3,7 @@ package evm
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"gitlab.com/distributed_lab/logan/v3/errors"
+	"gitlab.com/tokend/bridge/core/internal/amount"
 	"gitlab.com/tokend/bridge/core/internal/proxy/evm/enums"
 	"gitlab.com/tokend/bridge/core/internal/proxy/types"
 	"math/big"
@@ -84,6 +85,10 @@ func (p *evmProxy) lockErc721(params types.NonFungibleLockParams) (interface{}, 
 func (p *evmProxy) lockErc1155(params types.NonFungibleLockParams) (interface{}, error) {
 	senderAddr := common.HexToAddress(params.Sender)
 	tokenId, ok := big.NewInt(0).SetString(params.NftId, 10)
+	am := amount.MustNewFromString("1")
+	if params.Amount != nil {
+		am = *params.Amount
+	}
 	if !ok {
 		return nil, errors.New("failed to parse token id")
 	}
@@ -91,8 +96,7 @@ func (p *evmProxy) lockErc1155(params types.NonFungibleLockParams) (interface{},
 		buildTransactOpts(senderAddr),
 		common.HexToAddress(*params.TokenChain.ContractAddress),
 		tokenId,
-		// TODO: Allow to specify amount for fungible tokens
-		big.NewInt(1),
+		am.IntWithPrecision(0),
 		params.Receiver,
 		params.DestinationChain,
 		uint8(enums.ToErc1155BridgingType(params.TokenChain.BridgingType)),
