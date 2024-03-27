@@ -1,45 +1,45 @@
-log:                    # loging configuration
+log:                    # logger configuration
   level: info           # level of logging, possible values: panic, fatal, error, warn, info, debug, trace. For prod best options will be info or warn
   disable_sentry: true  # possible sentry configuration
 
 listener:
-  addr: :80 # address on wich API will be accessiable, ussualy just specify port
+  addr: :80 # address on which API will be accessible
 
 data:
   tokens:                                                                    # list of supported tokens
-    - id: "1"                                                                # some custom token ID
+    - id: "1"                                                                # some custom token ID, you can use any string here, but this id mustn't be changed after first setup as it is used in smart contracts
       name: "Tether USDT"                                                    # Token name
       symbol: "USDT"                                                         # Token symbol
       icon: "https://etherscan.io/token/images/tether_32.png"                # Link to token icon, optional
       type: fungible                                                         # token type: fungible or non-fungible
-      chains:                                                                # Chains on wich token could be bridged
-        - chain_id: "1"                                                      # Chain ID, should be the same as id in chains defenition
+      chains:                                                                # Chains on which token could be bridged
+        - chain_id: "1"                                                      # Chain ID, should be the same as id in chains definition
           token_type: erc20                                                  # EVM token type: native, erc20, erc721, erc1155
           contract_address: "0x1bF3684E7bd3ecac57dA485EF110A131321fF64D"     # Contract address, for native skip this field
-          bridging_type: liquidity_pool                                      # Bridging type: liquidity_pool (token locked/unlocked on bridge contract), wrapped (token burned/minted)
+          bridging_type: liquidity_pool                                      # Bridging type: liquidity_pool (token locked/unlocked on bridge contract), wrapped (token burned/minted), usdc (only for USDC token on qtum chain, works the same as wrapped)
           auto_send: true                                                    # Optional, specify true if you want bridge to send tokens instead of user for this case
         - chain_id: "2"
           token_type: erc20
           bridging_type: wrapped
           contract_address: "0xB3DA24CEf82514341C9390764D764C40163bE7a2"
   chains:
-    - id: "1"                                                                           # custom chain ID, you mustn't change it after first setup as it is used in contracts
+    - id: "1"                                                                           # custom chain identifier, you mustn't change it after first setup as it is used in smart contracts
       name: "Rinkeby"                                                                   # Chain name
       icon: "https://chainlist.org/_next/img"                                           # Chain icon, optional
-      type: "evm"                                                                       # Chain type: evm
-      bridge_contract: "0xFe9B3D3C75f870a969e4852807d0a16f3745D723"                     # Address of bbridge contract
-      rpc_endpoint: "wss://rinkeby.infura.io/ws/v3/3dc0806d2f734be6968d8515f49a5a1d"    # Link to ethereum RPC
+      type: "evm"                                                                       # Chain type: evm or qtum
+      bridge_contract: "0xFe9B3D3C75f870a969e4852807d0a16f3745D723"                     # Address of the bridge contract
+      rpc_endpoint: ""                                                                  # URL of ethereum RPC
       confirmations: 1                                                                  # Number of confirmations needed for lock transaction to be confirmed before you will be able to redeem tokens
       chain_params:                                                                     # Custom chain params for frontend
-        chain_id: 4                                                                     # Ethereum chain id
-        native_symbol: "ETH"                                                            # Ethereum native currency symbol
+        chain_id: 4                                                                     # EVM chain id
+        native_symbol: "ETH"                                                            # Chain native currency symbol
         api_url: "https://api-rinkeby.etherscan.io"                                     # Explorer api url
     - id: "2"
       name: "Ropsten"
       icon: "https://chainlist.org/_next/image?url=https%3A%2F%2Fdefillama.com%2Fchain-icons%2Frsz_ethereum.jpg&w=64&q=75"
       type: "evm"
       bridge_contract: "0xb3c0F925fd04bA9A99a12755e65efEEb2BFf378B"
-      proxy_endpoint: "wss://ropsten.infura.io/ws/v3/3dc0806d2f734be6968d8515f49a5a1d"
+      proxy_endpoint: ""
       chain_params:
         chain_id: 3
         native_symbol: "ETH"
@@ -48,9 +48,3 @@ data:
 
 signer:
   eth_signer: ""  # Private key of signer for ethereum contracts
-
-ipfs:
-  endpoint: "" # Endpoint for IPFS proxy
-
-cop:                          # Configuration of API gateway, not used in this project, but could be enabled
-  disabled: true
